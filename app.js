@@ -363,18 +363,25 @@
         }
     }
 
-    // Periodic sync every 60 seconds when signed in
+    // Periodic sync every 2 minutes when signed in
     setInterval(() => {
         if (state.useFirebase && state.authUser && state.player && document.visibilityState === 'visible') {
             forceCloudSync(true);
         }
-    }, 60000);
+    }, 120000);
 
-    // Also sync when tab becomes visible again (e.g. switching from phone to laptop)
+    // Sync when tab becomes visible again (e.g. switching from phone to laptop)
+    // Debounce: only if tab was hidden for at least 5 seconds
+    let _lastHiddenAt = 0;
     document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && state.useFirebase && state.authUser && state.player) {
-            console.log('👁️ Tab became visible — syncing...');
-            forceCloudSync(true);
+        if (document.visibilityState === 'hidden') {
+            _lastHiddenAt = Date.now();
+        } else if (document.visibilityState === 'visible' && state.useFirebase && state.authUser && state.player) {
+            const hiddenFor = Date.now() - _lastHiddenAt;
+            if (_lastHiddenAt > 0 && hiddenFor > 5000) {
+                console.log('👁️ Tab became visible after', Math.round(hiddenFor / 1000), 's — syncing...');
+                forceCloudSync(true);
+            }
         }
     });
 
@@ -1706,12 +1713,9 @@
                             console.warn('Cloud sync on auto-login failed:', e);
                         }
 
-                        // If any saves happened before auth was ready, catch up now
-                        if (state._pendingCloudSync) {
-                            console.log('📤 Flushing pending cloud sync...');
-                            state._pendingCloudSync = false;
-                            savePlayer();
-                        }
+                        // If any saves happened before auth was ready, the merge above already incorporated them
+                        // Just clear the pending flag
+                        state._pendingCloudSync = false;
                     }
                 });
             }
