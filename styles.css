@@ -2518,34 +2518,95 @@ input::placeholder {
 }
 
 /* Leaderboard */
-.leaderboard-tabs .tab-btn {
+.lb-tabs {
     background: var(--bg-input) !important;
-    color: var(--text-secondary) !important;
-    border-color: var(--border-color) !important;
+    border: 1px solid var(--border-color);
 }
 
-.leaderboard-tabs .tab-btn.active {
+.lb-tab {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
+.lb-tab:hover {
+    color: var(--text-primary) !important;
+}
+
+.lb-tab.active {
     background: var(--primary) !important;
     color: white !important;
 }
 
-.leaderboard-row {
+.lb-row {
     background: var(--bg-card) !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    border: 1px solid var(--border-color) !important;
     color: var(--text-primary) !important;
 }
 
-.leaderboard-row:hover,
-.leaderboard-row.you-row {
+.lb-row:hover {
     background: var(--bg-card-hover) !important;
 }
 
-.lb-name, .lb-xp, .lb-rank {
+.lb-row.top-1 {
+    background: rgba(255, 215, 0, 0.08) !important;
+    border-left: 4px solid #FFD700 !important;
+}
+
+.lb-row.top-2 {
+    background: rgba(192, 192, 192, 0.08) !important;
+    border-left: 4px solid #C0C0C0 !important;
+}
+
+.lb-row.top-3 {
+    background: rgba(205, 127, 50, 0.08) !important;
+    border-left: 4px solid #CD7F32 !important;
+}
+
+.lb-row.is-you {
+    background: rgba(108, 99, 255, 0.12) !important;
+    border: 2px solid var(--primary) !important;
+}
+
+.lb-player-name {
     color: var(--text-primary) !important;
 }
 
-.lb-grade {
+.lb-player-meta {
     color: var(--text-secondary) !important;
+}
+
+.lb-score-value {
+    color: var(--primary-light) !important;
+}
+
+.lb-score-label {
+    color: var(--text-secondary) !important;
+}
+
+.lb-rank {
+    color: var(--text-secondary) !important;
+}
+
+.lb-row.top-1 .lb-rank { color: #FFD700 !important; }
+.lb-row.top-2 .lb-rank { color: #C0C0C0 !important; }
+.lb-row.top-3 .lb-rank { color: #CD7F32 !important; }
+
+.lb-stat-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.lb-stat-value {
+    color: var(--primary-light) !important;
+}
+
+.lb-stat-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Back button on leaderboard */
+#btn-back-from-leaderboard {
+    color: var(--text-primary) !important;
 }
 
 /* Reward cards */
