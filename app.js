@@ -349,6 +349,38 @@
         savePlayer();
     }
 
+    // ─── Merge two player data objects, keeping the best of each ──
+    function mergePlayerData(a, b) {
+        const merged = { ...a };
+        const maxFields = [
+            'points', 'totalXP', 'totalQuizzes', 'totalCorrect', 'totalAttempted',
+            'totalPointsEarned', 'streak', 'maxStreak', 'perfectScores',
+            'quizzesWithNoHints', 'blitzHighAccuracy', 'hardCorrect', 'maxCombo',
+            'dailyChallengesCompleted', 'totalRedemptions'
+        ];
+        for (const key of maxFields) {
+            merged[key] = Math.max(a[key] || 0, b[key] || 0);
+        }
+        merged.achievements = [...new Set([...(a.achievements || []), ...(b.achievements || [])])];
+        merged.categoriesPlayed = { ...(a.categoriesPlayed || {}), ...(b.categoriesPlayed || {}) };
+        merged.categoryHighScores = { ...(a.categoryHighScores || {}) };
+        for (const cat in (b.categoryHighScores || {})) {
+            merged.categoryHighScores[cat] = Math.max(merged.categoryHighScores[cat] || 0, b.categoryHighScores[cat]);
+        }
+        merged.dailyStreakDates = [...new Set([...(a.dailyStreakDates || []), ...(b.dailyStreakDates || [])])].sort();
+        merged.redeemedRewards = (a.redeemedRewards || []).length >= (b.redeemedRewards || []).length
+            ? (a.redeemedRewards || []) : (b.redeemedRewards || []);
+        merged.sessions = (a.sessions || []).length >= (b.sessions || []).length
+            ? (a.sessions || []) : (b.sessions || []);
+        merged.name = a.name || b.name;
+        merged.grade = a.grade || b.grade;
+        if (a.lastPlayedDate && b.lastPlayedDate) {
+            merged.lastPlayedDate = new Date(a.lastPlayedDate) > new Date(b.lastPlayedDate)
+                ? a.lastPlayedDate : b.lastPlayedDate;
+        }
+        return merged;
+    }
+
     // ===================== WELCOME SCREEN =====================
     function migratePlayer(p) {
         if (!p.totalXP) p.totalXP = (p.totalPointsEarned || 0) * 2;
@@ -477,54 +509,6 @@
                 // Save merged data back to both localStorage AND Firestore
                 savePlayer();
             }
-        }
-
-        // Merge two player data objects, keeping the best of each
-        function mergePlayerData(a, b) {
-            const merged = { ...a };
-            // Keep higher numeric stats
-            const maxFields = [
-                'points', 'totalXP', 'totalQuizzes', 'totalCorrect', 'totalAttempted',
-                'totalPointsEarned', 'streak', 'maxStreak', 'perfectScores',
-                'quizzesWithNoHints', 'blitzHighAccuracy', 'hardCorrect', 'maxCombo',
-                'dailyChallengesCompleted', 'totalRedemptions'
-            ];
-            for (const key of maxFields) {
-                merged[key] = Math.max(a[key] || 0, b[key] || 0);
-            }
-            // Merge achievements (union)
-            const achieveA = new Set(a.achievements || []);
-            const achieveB = new Set(b.achievements || []);
-            merged.achievements = [...new Set([...achieveA, ...achieveB])];
-            // Merge categoriesPlayed (union)
-            merged.categoriesPlayed = { ...(a.categoriesPlayed || {}), ...(b.categoriesPlayed || {}) };
-            // Merge categoryHighScores (max of each)
-            merged.categoryHighScores = { ...(a.categoryHighScores || {}) };
-            for (const cat in (b.categoryHighScores || {})) {
-                merged.categoryHighScores[cat] = Math.max(merged.categoryHighScores[cat] || 0, b.categoryHighScores[cat]);
-            }
-            // Merge dailyStreakDates (union, sorted)
-            const datesA = new Set(a.dailyStreakDates || []);
-            const datesB = new Set(b.dailyStreakDates || []);
-            merged.dailyStreakDates = [...new Set([...datesA, ...datesB])].sort();
-            // Merge redeemed rewards (union)
-            const redeemedA = new Set((a.redeemedRewards || []).map(r => typeof r === 'string' ? r : r.id));
-            const redeemedB = new Set((b.redeemedRewards || []).map(r => typeof r === 'string' ? r : r.id));
-            // Keep the longer redeemed array with more info
-            merged.redeemedRewards = (a.redeemedRewards || []).length >= (b.redeemedRewards || []).length
-                ? (a.redeemedRewards || []) : (b.redeemedRewards || []);
-            // Keep more recent session history (longer array)
-            merged.sessions = (a.sessions || []).length >= (b.sessions || []).length
-                ? (a.sessions || []) : (b.sessions || []);
-            // Use most recent name and grade (prefer non-default)
-            merged.name = a.name || b.name;
-            merged.grade = a.grade || b.grade;
-            // Use the most recent lastPlayedDate
-            if (a.lastPlayedDate && b.lastPlayedDate) {
-                merged.lastPlayedDate = new Date(a.lastPlayedDate) > new Date(b.lastPlayedDate)
-                    ? a.lastPlayedDate : b.lastPlayedDate;
-            }
-            return merged;
         }
 
         // ─── Sign-out button ───
@@ -1238,16 +1222,18 @@
         // Build the combined list
         let allPlayers;
         const myUid = state.authUser?.uid;
+        const myName = p.name?.toLowerCase();
 
         if (realPlayers.length > 0) {
             // Use real players from Firestore, mark current user
             allPlayers = realPlayers.map(pl => ({
                 ...pl,
                 level: getLevelFromXP(pl.totalXP || 0).level,
-                isYou: pl.uid === myUid,
+                // Match by uid first, then by name as fallback
+                isYou: (myUid && pl.uid === myUid) || (!myUid && pl.name?.toLowerCase() === myName),
                 isBot: false
             }));
-            // Ensure current player is in the list
+            // Ensure current player is in the list (but only if not already matched)
             const meInList = allPlayers.find(pl => pl.isYou);
             if (!meInList) {
                 const levelInfo = getLevelFromXP(p.totalXP || 0);
@@ -1589,7 +1575,6 @@
         });
 
         // ─── Auto-login returning user from localStorage ───
-        // If user was previously logged in, try to restore their session
         const savedPlayers = JSON.parse(localStorage.getItem('mathchamp_players') || '{}');
         const lastPlayerName = localStorage.getItem('mathchamp_last_player');
         if (lastPlayerName && savedPlayers[lastPlayerName.toLowerCase()]) {
@@ -1597,6 +1582,37 @@
             migratePlayer(p);
             state.player = p;
             state.bots = generateBotPlayers(p.grade);
+
+            // Initialize Firebase for auto-login users too
+            if (!state.useFirebase && typeof initFirebase === 'function') {
+                state.useFirebase = initFirebase();
+            }
+
+            // Listen for Firebase auth to restore authUser
+            if (state.useFirebase && typeof FirebaseAuthHelper !== 'undefined') {
+                FirebaseAuthHelper.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        state.authUser = FirebaseAuthHelper.getUserInfo(user);
+                        // Sync latest data from cloud
+                        try {
+                            const cloudPlayer = await FirestoreDB.loadPlayer(user.uid);
+                            if (cloudPlayer) {
+                                delete cloudPlayer.updatedAt;
+                                const merged = mergePlayerData(cloudPlayer, state.player);
+                                migratePlayer(merged);
+                                state.player = merged;
+                                savePlayer();
+                                // Refresh current screen if on dashboard/leaderboard
+                                if (state.currentScreen === 'dashboard') showDashboard();
+                                else if (state.currentScreen === 'leaderboard') showLeaderboard();
+                            }
+                        } catch (e) {
+                            console.warn('Cloud sync on auto-login failed:', e);
+                        }
+                    }
+                });
+            }
+
             updateStreak();
             // If there's a hash route, go directly there
             if (window.location.hash && window.location.hash !== '#') {
