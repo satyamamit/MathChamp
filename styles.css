@@ -320,6 +320,29 @@ body {
     transform: translateY(-1px);
 }
 
+.btn-sync-nav {
+    background: rgba(78, 205, 196, 0.15);
+    border: 1px solid rgba(78, 205, 196, 0.3);
+    border-radius: var(--radius-full);
+    padding: 8px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    line-height: 1;
+}
+.btn-sync-nav:hover {
+    background: rgba(78, 205, 196, 0.3);
+    border-color: #4ECDC4;
+    transform: translateY(-1px);
+}
+.btn-sync-nav.syncing {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 .btn-link {
     background: none;
     border: none;

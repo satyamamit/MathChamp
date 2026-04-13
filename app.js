@@ -300,7 +300,10 @@
         } else {
             // Log why cloud save was skipped
             if (!state.useFirebase) console.log('💾 Local only (Firebase not initialized)');
-            else if (!state.authUser) console.log('💾 Local only (not signed in with Google)');
+            else if (!state.authUser) {
+                console.log('💾 Local only (not signed in yet) — marking pending sync');
+                state._pendingCloudSync = true; // Will be picked up when auth resolves
+            }
         }
     }
 
@@ -317,6 +320,63 @@
         clearTimeout(el._timer);
         el._timer = setTimeout(() => { el.className = 'sync-status'; }, 2000);
     }
+
+    // Force a full cloud sync: pull cloud data, merge with local, save everywhere
+    let _syncInProgress = false;
+    async function forceCloudSync(silent) {
+        if (_syncInProgress) { console.log('🔄 Sync already in progress, skipping'); return; }
+        if (!state.useFirebase || !state.authUser || !state.player) {
+            if (!silent) showToast('Not signed in to Google — cannot sync', 'error');
+            return;
+        }
+        _syncInProgress = true;
+        const syncBtn = $('#btn-sync-now');
+        if (syncBtn) syncBtn.classList.add('syncing');
+        showSyncStatus('syncing');
+        console.log('🔄 Force sync started...');
+        try {
+            const cloudPlayer = await FirestoreDB.loadPlayer(state.authUser.uid);
+            if (cloudPlayer) {
+                delete cloudPlayer.updatedAt;
+                console.log('🔄 Cloud:', { xp: cloudPlayer.totalXP, quizzes: cloudPlayer.totalQuizzes, pts: cloudPlayer.points });
+                console.log('🔄 Local:', { xp: state.player.totalXP, quizzes: state.player.totalQuizzes, pts: state.player.points });
+                const merged = mergePlayerData(cloudPlayer, state.player);
+                migratePlayer(merged);
+                console.log('🔄 Merged:', { xp: merged.totalXP, quizzes: merged.totalQuizzes, pts: merged.points });
+                state.player = merged;
+            } else {
+                console.log('🔄 No cloud data found, pushing local to cloud');
+            }
+            // Save everywhere (localStorage + Firestore)
+            savePlayer();
+            if (!silent) showToast('☁️ Data synced!', 'success');
+            // Refresh current view
+            if (state.currentScreen === 'dashboard') showDashboard();
+            else if (state.currentScreen === 'leaderboard') showLeaderboard();
+        } catch (e) {
+            console.error('🔄 Force sync failed:', e);
+            if (!silent) showToast('Sync failed — check connection', 'error');
+            showSyncStatus('offline');
+        } finally {
+            _syncInProgress = false;
+            if (syncBtn) syncBtn.classList.remove('syncing');
+        }
+    }
+
+    // Periodic sync every 60 seconds when signed in
+    setInterval(() => {
+        if (state.useFirebase && state.authUser && state.player && document.visibilityState === 'visible') {
+            forceCloudSync(true);
+        }
+    }, 60000);
+
+    // Also sync when tab becomes visible again (e.g. switching from phone to laptop)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && state.useFirebase && state.authUser && state.player) {
+            console.log('👁️ Tab became visible — syncing...');
+            forceCloudSync(true);
+        }
+    });
 
     function loadPlayer(name) {
         const all = JSON.parse(localStorage.getItem('mathchamp_players') || '{}');
@@ -644,6 +704,13 @@
             ? 'Signed in — data syncs to cloud'
             : 'Local mode — sign in with Google to sync across devices';
         showSyncStatus(state.useFirebase && state.authUser ? 'synced' : 'offline');
+
+        // Sync button visibility
+        const syncBtn = $('#btn-sync-now');
+        if (syncBtn) {
+            syncBtn.style.display = (state.useFirebase && state.authUser) ? 'inline-block' : 'none';
+            syncBtn.onclick = () => forceCloudSync(false);
+        }
 
         // XP Banner
         $('#dash-rank-badge').textContent = tier.emoji;
@@ -1610,21 +1677,40 @@
                 FirebaseAuthHelper.onAuthStateChanged(async (user) => {
                     if (user) {
                         state.authUser = FirebaseAuthHelper.getUserInfo(user);
+                        console.log('🔑 Auth restored for:', user.displayName, 'uid:', user.uid);
+                        
+                        // Show sync button now that auth is ready
+                        const syncBtn = $('#btn-sync-now');
+                        if (syncBtn) { syncBtn.style.display = 'inline-block'; syncBtn.onclick = () => forceCloudSync(false); }
+
                         // Sync latest data from cloud
                         try {
                             const cloudPlayer = await FirestoreDB.loadPlayer(user.uid);
                             if (cloudPlayer) {
                                 delete cloudPlayer.updatedAt;
+                                console.log('☁️ Cloud data:', { xp: cloudPlayer.totalXP, quizzes: cloudPlayer.totalQuizzes, points: cloudPlayer.points });
+                                console.log('💾 Local data:', { xp: state.player.totalXP, quizzes: state.player.totalQuizzes, points: state.player.points });
                                 const merged = mergePlayerData(cloudPlayer, state.player);
+                                console.log('🔀 Merged data:', { xp: merged.totalXP, quizzes: merged.totalQuizzes, points: merged.points });
                                 migratePlayer(merged);
                                 state.player = merged;
-                                savePlayer();
+                                savePlayer(); // This will push merged data to both localStorage AND Firestore
                                 // Refresh current screen if on dashboard/leaderboard
                                 if (state.currentScreen === 'dashboard') showDashboard();
                                 else if (state.currentScreen === 'leaderboard') showLeaderboard();
+                            } else {
+                                console.log('ℹ️ No cloud data found, pushing local data to cloud');
+                                savePlayer(); // Push local data to cloud for the first time
                             }
                         } catch (e) {
                             console.warn('Cloud sync on auto-login failed:', e);
+                        }
+
+                        // If any saves happened before auth was ready, catch up now
+                        if (state._pendingCloudSync) {
+                            console.log('📤 Flushing pending cloud sync...');
+                            state._pendingCloudSync = false;
+                            savePlayer();
                         }
                     }
                 });
