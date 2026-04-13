@@ -2392,6 +2392,50 @@ input::placeholder {
     border-color: var(--primary) !important;
 }
 
+/* Welcome screen fixes */
+.welcome-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.welcome-card h2 {
+    color: var(--primary-light) !important;
+}
+
+.form-group label {
+    color: #B8B8D0 !important;
+}
+
+.form-group input[type="text"] {
+    background: var(--bg-input) !important;
+    color: #FFFFFF !important;
+    border: 2px solid var(--border-color) !important;
+    caret-color: var(--primary-light);
+}
+
+.form-group input[type="text"]:focus {
+    border-color: var(--primary) !important;
+}
+
+/* Google auth user info bar */
+.auth-user-info {
+    background: rgba(46, 213, 115, 0.1) !important;
+    border: 1px solid rgba(46, 213, 115, 0.3) !important;
+}
+
+.auth-user-name {
+    color: #FFFFFF !important;
+}
+
+/* Returning player link */
+.returning-player {
+    color: var(--text-secondary) !important;
+}
+
+.returning-player .btn-link {
+    color: var(--primary-light) !important;
+}
+
 /* Nav bar */
 .top-nav {
     background: var(--bg-dark) !important;
@@ -2683,17 +2727,77 @@ body {
 
 /* Question text */
 .question-text {
-    color: var(--text-primary) !important;
+    color: #FFFFFF !important;
+    font-size: 1.25rem !important;
 }
 
-/* Timer */
-.timer-bar {
+/* Question area (the card holding the question) */
+.question-area {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.question-number {
+    color: var(--primary-light) !important;
+}
+
+/* Source badge */
+.source-badge {
+    background: rgba(108, 99, 255, 0.2) !important;
+    color: var(--primary-light) !important;
+    border-color: rgba(108, 99, 255, 0.3) !important;
+}
+
+/* Timer bar container */
+.timer-bar-container {
     background: var(--bg-input) !important;
 }
 
-/* Hint text */
+/* Hint box & button */
+.hint-box {
+    background: rgba(255, 165, 2, 0.1) !important;
+    border-color: rgba(255, 165, 2, 0.4) !important;
+}
+
 .hint-text {
+    color: #FBBF24 !important;
+}
+
+.btn-hint {
+    background: rgba(255, 165, 2, 0.15) !important;
+    border-color: rgba(255, 165, 2, 0.5) !important;
+    color: #FBBF24 !important;
+}
+
+.btn-hint:hover:not(:disabled) {
+    background: var(--accent-yellow) !important;
+    color: #1A1A2E !important;
+}
+
+/* Feedback boxes */
+.feedback-box.correct {
+    background: rgba(46, 213, 115, 0.15) !important;
+    border-color: var(--accent-green) !important;
+    color: var(--text-primary) !important;
+}
+
+.feedback-box.wrong {
+    background: rgba(255, 107, 107, 0.15) !important;
+    border-color: var(--secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.feedback-message {
+    color: var(--text-primary) !important;
+}
+
+.feedback-explanation {
     color: var(--text-secondary) !important;
+}
+
+.feedback-points {
+    color: var(--primary-light) !important;
 }
 
 /* Footer / bottom nav */
