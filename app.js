@@ -283,14 +283,24 @@
             }).then(ok => {
                 if (ok) {
                     showSyncStatus('synced');
-                    console.log('☁️ Player data synced to cloud');
+                    console.log('☁️ Player data synced to cloud:', {
+                        name: state.player.name,
+                        totalXP: state.player.totalXP,
+                        totalQuizzes: state.player.totalQuizzes,
+                        points: state.player.points
+                    });
                 } else {
                     showSyncStatus('offline');
+                    console.warn('⚠️ Firestore save returned false');
                 }
             }).catch(err => {
-                console.error('Sync error:', err);
+                console.error('❌ Sync error:', err);
                 showSyncStatus('offline');
             });
+        } else {
+            // Log why cloud save was skipped
+            if (!state.useFirebase) console.log('💾 Local only (Firebase not initialized)');
+            else if (!state.authUser) console.log('💾 Local only (not signed in with Google)');
         }
     }
 
@@ -627,6 +637,13 @@
         } else if (navAvatar) {
             navAvatar.style.display = 'none';
         }
+
+        // Show cloud sync status on dashboard
+        const syncInfo = state.useFirebase && state.authUser ? '☁️' : '💾';
+        const syncTitle = state.useFirebase && state.authUser
+            ? 'Signed in — data syncs to cloud'
+            : 'Local mode — sign in with Google to sync across devices';
+        showSyncStatus(state.useFirebase && state.authUser ? 'synced' : 'offline');
 
         // XP Banner
         $('#dash-rank-badge').textContent = tier.emoji;
