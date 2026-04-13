@@ -592,17 +592,263 @@ const QuestionAPI = (function () {
       const { options, answer } = makeOptions(Math.round(roundDist * 10), Math.max(10, 20));
       return { q: `What is the distance between points (${x1}, ${y1}) and (${x2}, ${y2})? (Round to 1 decimal)`, options: options.map(v => (v / 10).toFixed(1)), answer, hint: 'Use the distance formula: √((x₂-x₁)² + (y₂-y₁)²)', explanation: `d = √((${x2}-${x1})² + (${y2}-${y1})²) = √(${dx * dx} + ${dy * dy}) ≈ ${roundDist}`, difficulty: 'hard', source: 'Competition Style' };
     },
+
+    // ── UNIT CONVERSION (FastBridge) ────────────────────────
+    unitConversion(grade) {
+      const conversions = grade <= 3 ? [
+        { from: 'feet', to: 'inches', factor: 12, unit: rand(1, 5) },
+        { from: 'yards', to: 'feet', factor: 3, unit: rand(1, 8) },
+        { from: 'hours', to: 'minutes', factor: 60, unit: rand(1, 5) },
+        { from: 'minutes', to: 'seconds', factor: 60, unit: rand(1, 5) },
+      ] : grade <= 5 ? [
+        { from: 'feet', to: 'inches', factor: 12, unit: rand(2, 10) },
+        { from: 'miles', to: 'feet', factor: 5280, unit: rand(1, 3) },
+        { from: 'kg', to: 'grams', factor: 1000, unit: rand(1, 8) },
+        { from: 'liters', to: 'mL', factor: 1000, unit: rand(1, 5) },
+        { from: 'meters', to: 'cm', factor: 100, unit: rand(1, 10) },
+        { from: 'km', to: 'meters', factor: 1000, unit: rand(1, 5) },
+        { from: 'gallons', to: 'quarts', factor: 4, unit: rand(1, 8) },
+        { from: 'pounds', to: 'ounces', factor: 16, unit: rand(1, 6) },
+      ] : [
+        { from: 'miles', to: 'feet', factor: 5280, unit: rand(1, 5) },
+        { from: 'km', to: 'meters', factor: 1000, unit: rand(1, 10) },
+        { from: 'kg', to: 'grams', factor: 1000, unit: rand(1, 15) },
+        { from: 'liters', to: 'mL', factor: 1000, unit: rand(1, 8) },
+        { from: 'tons', to: 'pounds', factor: 2000, unit: rand(1, 5) },
+        { from: 'cups', to: 'fluid ounces', factor: 8, unit: rand(1, 10) },
+      ];
+      const c = pick(conversions);
+      const correct = c.unit * c.factor;
+      return { q: `How many ${c.to} are in ${c.unit} ${c.from}?`, ...makeOptions(correct, Math.max(10, Math.floor(correct * 0.3))), hint: `1 ${c.from.replace(/s$/, '')} = ${c.factor} ${c.to}`, explanation: `${c.unit} × ${c.factor} = ${correct.toLocaleString()} ${c.to}`, difficulty: grade <= 3 ? 'easy' : 'medium', source: 'FastBridge Prep' };
+    },
+
+    // ── ESTIMATION (FastBridge) ─────────────────────────────
+    estimation(grade) {
+      const types = grade <= 3 ? [
+        () => { const a = rand(10, 99), b = rand(10, 99); const correct = Math.round(a / 10) * 10 + Math.round(b / 10) * 10; return { q: `Estimate ${a} + ${b} by rounding to the nearest 10.`, correct, hint: `Round each number to the nearest 10 first.`, spread: 20 }; },
+        () => { const a = rand(100, 999), b = rand(100, 999); const correct = Math.round(a / 100) * 100 + Math.round(b / 100) * 100; return { q: `Estimate ${a} + ${b} by rounding to the nearest 100.`, correct, hint: `Round each to the nearest 100.`, spread: 200 }; },
+      ] : grade <= 5 ? [
+        () => { const a = rand(100, 999), b = rand(10, 99); const correct = Math.round(a / 100) * 100 * Math.round(b / 10) * 10; const better = Math.round(a * b / 1000) * 1000; return { q: `Estimate ${a} × ${b} by rounding.`, correct: better, hint: `Round ${a} to the nearest 100 and ${b} to the nearest 10.`, spread: Math.max(500, Math.floor(better * 0.3)) }; },
+        () => { const a = rand(1000, 9999), b = rand(100, 999); const correct = Math.round((a + b) / 1000) * 1000; return { q: `Estimate ${a.toLocaleString()} + ${b} by rounding to the nearest 1,000.`, correct, hint: `Round both to the nearest 1,000.`, spread: 2000 }; },
+        () => { const a = rand(2, 8), b = rand(2, 8); const n = a * a + rand(-3, 3); const correct = a; return { q: `Estimate √${n} to the nearest whole number.`, correct, hint: `${a}² = ${a*a}`, spread: 3 }; },
+      ] : [
+        () => { const a = rand(100, 500), b = rand(10, 50); const correct = Math.round(a * b / 1000) * 1000; return { q: `Which is the best estimate for ${a} × ${b}?`, correct, hint: 'Round each factor then multiply.', spread: Math.max(1000, Math.floor(correct * 0.4)) }; },
+        () => { const n = rand(10, 99); const sq = n * n; const correct = n; return { q: `Estimate √${sq} without a calculator.`, correct, hint: `Think: what number × itself ≈ ${sq}?`, spread: 5 }; },
+        () => { const nums = [rand(1,9), rand(1,9)]; const frac = `${nums[0]}/${nums[0]+nums[1]}`; const val = nums[0]/(nums[0]+nums[1]); const closest = val < 0.25 ? '0' : val < 0.75 ? '1/2' : '1'; return { q: `Is ${frac} closest to 0, 1/2, or 1?`, ...makeStringOptions(closest, ['0', '1/2', '1', '2']), hint: `${nums[0]} ÷ ${nums[0]+nums[1]} ≈ ${val.toFixed(2)}`, explanation: `${frac} ≈ ${val.toFixed(2)}, closest to ${closest}`, difficulty: 'medium', source: 'FastBridge Prep' }; },
+      ];
+      const gen = pick(types)();
+      if (gen.options) return gen; // already formatted (like fraction estimation)
+      return { q: gen.q, ...makeOptions(gen.correct, gen.spread), hint: gen.hint, explanation: `The answer is ${gen.correct.toLocaleString()}.`, difficulty: grade <= 3 ? 'easy' : 'medium', source: 'FastBridge Prep' };
+    },
+
+    // ── DATA / STATISTICS TABLE (FastBridge) ────────────────
+    dataTable(grade) {
+      const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'James', 'Sophia', 'Mason'];
+      const subjects = ['Math', 'Science', 'Reading', 'History', 'Art'];
+      const activities = ['soccer', 'basketball', 'swimming', 'baseball', 'tennis'];
+      const items = ['apples', 'oranges', 'bananas', 'grapes', 'strawberries'];
+
+      const types = [
+        () => {
+          const n = rand(3, 5);
+          const picked = shuffle(names).slice(0, n);
+          const values = picked.map(() => rand(2, grade <= 3 ? 15 : 30));
+          const total = values.reduce((a, b) => a + b, 0);
+          const desc = picked.map((p, i) => `${p}: ${values[i]}`).join(', ');
+          const item = pick(items);
+          return { q: `A table shows ${item} collected: ${desc}. What is the total?`, correct: total, hint: 'Add all the values.', explanation: `${values.join(' + ')} = ${total}` };
+        },
+        () => {
+          const n = rand(3, 5);
+          const picked = shuffle(names).slice(0, n);
+          const values = picked.map(() => rand(5, grade <= 3 ? 20 : 50));
+          const maxVal = Math.max(...values);
+          const minVal = Math.min(...values);
+          const diff = maxVal - minVal;
+          const maxName = picked[values.indexOf(maxVal)];
+          const minName = picked[values.indexOf(minVal)];
+          const item = pick(['books read', 'points scored', 'stickers collected', 'laps completed']);
+          const desc = picked.map((p, i) => `${p}: ${values[i]}`).join(', ');
+          return { q: `${item}: ${desc}. How many more does ${maxName} have than ${minName}?`, correct: diff, hint: `Find the highest and lowest, then subtract.`, explanation: `${maxVal} − ${minVal} = ${diff}` };
+        },
+        () => {
+          const n = rand(4, 6);
+          const picked = shuffle(subjects).slice(0, Math.min(n, subjects.length));
+          const values = picked.map(() => rand(3, 25));
+          const total = values.reduce((a, b) => a + b, 0);
+          const desc = picked.map((s, i) => `${s}: ${values[i]}`).join(', ');
+          return { q: `Students' favorite subjects: ${desc}. How many students were surveyed?`, correct: total, hint: 'Add all students together.', explanation: `${values.join(' + ')} = ${total}` };
+        },
+      ];
+      const gen = pick(types)();
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(3, Math.floor(gen.correct * 0.25))), hint: gen.hint, explanation: gen.explanation, difficulty: grade <= 3 ? 'easy' : 'medium', source: 'FastBridge Prep' };
+    },
+
+    // ── MEAN / MEDIAN / MODE / RANGE (FastBridge) ───────────
+    meanMedianModeRange(grade) {
+      const n = grade <= 4 ? rand(3, 5) : rand(5, 7);
+      const values = Array.from({ length: n }, () => rand(1, grade <= 3 ? 20 : grade <= 5 ? 50 : 100));
+      // Occasionally add a repeated value for mode
+      if (Math.random() > 0.5 && values.length >= 3) { values[values.length - 1] = values[0]; }
+      const sorted = [...values].sort((a, b) => a - b);
+      const sum = values.reduce((a, b) => a + b, 0);
+      const mean = +(sum / values.length).toFixed(1);
+      const median = values.length % 2 === 1 ? sorted[Math.floor(values.length / 2)] : +((sorted[values.length / 2 - 1] + sorted[values.length / 2]) / 2).toFixed(1);
+      const range = sorted[sorted.length - 1] - sorted[0];
+      const freq = {};
+      values.forEach(v => freq[v] = (freq[v] || 0) + 1);
+      const maxFreq = Math.max(...Object.values(freq));
+      const modes = Object.keys(freq).filter(k => freq[k] === maxFreq).map(Number);
+
+      const type = pick(grade <= 3 ? ['range', 'median'] : ['mean', 'median', 'mode', 'range']);
+      const vStr = values.join(', ');
+
+      if (type === 'mean') {
+        const correct = Number.isInteger(mean) ? mean : mean;
+        return { q: `Find the mean (average) of: ${vStr}`, ...makeOptions(Math.round(mean), Math.max(5, Math.floor(mean * 0.3))), hint: `Add all numbers and divide by ${values.length}.`, explanation: `(${values.join(' + ')}) ÷ ${values.length} = ${mean}`, difficulty: 'medium', source: 'FastBridge Prep' };
+      } else if (type === 'median') {
+        return { q: `Find the median of: ${vStr}`, ...makeOptions(median, Math.max(3, Math.floor(median * 0.3))), hint: 'Sort the numbers, find the middle value.', explanation: `Sorted: ${sorted.join(', ')}. Median = ${median}`, difficulty: 'medium', source: 'FastBridge Prep' };
+      } else if (type === 'mode') {
+        if (maxFreq === 1) return Gen.meanMedianModeRange(grade); // retry if no mode
+        return { q: `Find the mode of: ${vStr}`, ...makeOptions(modes[0], Math.max(3, 10)), hint: 'The mode is the number that appears most often.', explanation: `${modes[0]} appears ${maxFreq} times.`, difficulty: 'easy', source: 'FastBridge Prep' };
+      } else {
+        return { q: `Find the range of: ${vStr}`, ...makeOptions(range, Math.max(3, Math.floor(range * 0.3))), hint: 'Range = highest − lowest.', explanation: `${sorted[sorted.length - 1]} − ${sorted[0]} = ${range}`, difficulty: 'easy', source: 'FastBridge Prep' };
+      }
+    },
+
+    // ── FRACTION MULTIPLY / DIVIDE (FastBridge) ─────────────
+    fractionMultDiv(grade) {
+      if (grade < 3) return Gen.fractionAddition(grade);
+      const op = pick(['multiply', 'divide']);
+      const a_n = rand(1, 6), a_d = rand(2, 8);
+      let b_n = rand(1, 6), b_d = rand(2, 8);
+      if (op === 'divide' && b_n === 0) b_n = 1;
+
+      let res_n, res_d, qText;
+      if (op === 'multiply') {
+        res_n = a_n * b_n;
+        res_d = a_d * b_d;
+        qText = `${a_n}/${a_d} × ${b_n}/${b_d}`;
+      } else {
+        res_n = a_n * b_d;
+        res_d = a_d * b_n;
+        qText = `${a_n}/${a_d} ÷ ${b_n}/${b_d}`;
+      }
+      const g = gcd(res_n, res_d);
+      const sn = res_n / g, sd = res_d / g;
+      const correct = `${sn}/${sd}`;
+      const distractors = [`${sn + 1}/${sd}`, `${sn}/${sd + 1}`, `${res_n}/${res_d}`, `${sd}/${sn}`].filter(d => d !== correct);
+      return { q: `What is ${qText}? (Simplify)`, ...makeStringOptions(correct, distractors), hint: op === 'multiply' ? 'Multiply numerators, multiply denominators.' : 'Flip the second fraction and multiply.', explanation: `${qText} = ${res_n}/${res_d} = ${correct}`, difficulty: 'medium', source: 'FastBridge Prep' };
+    },
+
+    // ── PERCENT CHANGE (FastBridge) ─────────────────────────
+    percentChange(grade) {
+      if (grade < 4) return Gen.percentages(grade);
+      const types = [
+        () => { const orig = rand(20, 200) * 5; const pct = pick([10, 15, 20, 25, 30, 50]); const increase = orig * pct / 100; const newPrice = orig + increase; return { q: `A $${orig} item's price increased by ${pct}%. New price?`, correct: newPrice, hint: `Find ${pct}% of $${orig}, then add.`, explanation: `${pct}% of ${orig} = ${increase}. New: $${orig} + $${increase} = $${newPrice}` }; },
+        () => { const orig = rand(20, 200) * 5; const pct = pick([10, 15, 20, 25, 30, 40, 50]); const discount = orig * pct / 100; const salePrice = orig - discount; return { q: `A $${orig} item is ${pct}% off. Sale price?`, correct: salePrice, hint: `Find ${pct}% of $${orig}, then subtract.`, explanation: `${pct}% of ${orig} = ${discount}. Sale: $${orig} − $${discount} = $${salePrice}` }; },
+        () => { const bill = rand(20, 80) * 1; const tipPct = pick([15, 18, 20, 25]); const tip = +(bill * tipPct / 100).toFixed(0); return { q: `Tip of ${tipPct}% on a $${bill} bill?`, correct: tip, hint: `Multiply $${bill} by ${tipPct / 100}.`, explanation: `${tipPct}% of $${bill} = $${tip}` }; },
+        () => { const orig = rand(40, 200); const newVal = orig + rand(10, 60); const change = newVal - orig; const pct = Math.round(change / orig * 100); return { q: `Price went from $${orig} to $${newVal}. Percent increase?`, correct: pct, hint: `Change ÷ original × 100`, explanation: `(${newVal} − ${orig}) ÷ ${orig} × 100 = ${pct}%` }; },
+      ];
+      const gen = pick(types)();
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(5, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: 'medium', source: 'FastBridge Prep' };
+    },
+
+    // ── COORDINATE PLANE (FastBridge / HCP) ─────────────────
+    coordinatePlane(grade) {
+      if (grade < 4) return Gen.area(grade);
+      const types = [
+        () => {
+          const x = rand(-10, 10), y = rand(-10, 10);
+          let quadrant;
+          if (x > 0 && y > 0) quadrant = 'I';
+          else if (x < 0 && y > 0) quadrant = 'II';
+          else if (x < 0 && y < 0) quadrant = 'III';
+          else if (x > 0 && y < 0) quadrant = 'IV';
+          else return Gen.coordinatePlane(grade); // on axis, retry
+          return { q: `Which quadrant contains the point (${x}, ${y})?`, ...makeStringOptions(quadrant, ['I', 'II', 'III', 'IV']), hint: 'I: (+,+) II: (−,+) III: (−,−) IV: (+,−)', explanation: `(${x}, ${y}) → Quadrant ${quadrant}`, difficulty: 'medium', source: 'FastBridge Prep' };
+        },
+        () => {
+          const x = rand(1, 8), y = rand(1, 8);
+          const axis = pick(['x', 'y']);
+          const rx = axis === 'x' ? x : -x;
+          const ry = axis === 'x' ? -y : y;
+          const correct = `(${rx}, ${ry})`;
+          const distractors = [`(${-rx}, ${ry})`, `(${rx}, ${-ry})`, `(${-x}, ${-y})`];
+          return { q: `Reflect (${x}, ${y}) over the ${axis}-axis.`, ...makeStringOptions(correct, distractors), hint: axis === 'x' ? 'Flip the y-coordinate sign.' : 'Flip the x-coordinate sign.', explanation: `Reflecting over ${axis}-axis: (${x}, ${y}) → ${correct}`, difficulty: 'medium', source: 'FastBridge Prep' };
+        },
+        () => {
+          const x1 = rand(0, 8), y1 = rand(0, 8), x2 = rand(0, 8), y2 = rand(0, 8);
+          if (x1 === x2) return Gen.coordinatePlane(grade);
+          const mx = +((x1 + x2) / 2).toFixed(1), my = +((y1 + y2) / 2).toFixed(1);
+          const correct = `(${mx}, ${my})`;
+          const distractors = [`(${mx + 1}, ${my})`, `(${mx}, ${my + 1})`, `(${mx - 1}, ${my - 1})`];
+          return { q: `What is the midpoint of (${x1}, ${y1}) and (${x2}, ${y2})?`, ...makeStringOptions(correct, distractors), hint: 'Midpoint = ((x₁+x₂)/2, (y₁+y₂)/2)', explanation: `((${x1}+${x2})/2, (${y1}+${y2})/2) = ${correct}`, difficulty: 'hard', source: 'FastBridge Prep' };
+        },
+      ];
+      return pick(types)();
+    },
+
+    // ── NUMBER ANALOGY (CogAT / HCP) ───────────────────────
+    numberAnalogy(grade) {
+      const types = [
+        () => {
+          const mult = rand(2, grade <= 4 ? 5 : 10);
+          const a = rand(2, 10), b = a * mult, c = rand(2, 10);
+          const correct = c * mult;
+          return { q: `${a} → ${b}, ${c} → ?`, correct, hint: `What do you multiply ${a} by to get ${b}?`, explanation: `Rule: ×${mult}. ${c} × ${mult} = ${correct}` };
+        },
+        () => {
+          const add = rand(3, grade <= 4 ? 15 : 30);
+          const a = rand(2, 20), b = a + add, c = rand(2, 20);
+          const correct = c + add;
+          return { q: `[${a} : ${b}] = [${c} : ?]`, correct, hint: `What is added to ${a} to get ${b}?`, explanation: `Rule: +${add}. ${c} + ${add} = ${correct}` };
+        },
+        () => {
+          const a = rand(2, grade <= 4 ? 8 : 12);
+          const b = a * a;
+          const c = rand(2, grade <= 4 ? 8 : 12);
+          const correct = c * c;
+          return { q: `${a} → ${b}, ${c} → ?`, correct, hint: `How is ${b} related to ${a}?`, explanation: `Rule: square it. ${c}² = ${correct}` };
+        },
+        () => {
+          if (grade < 5) { const m = rand(2, 5); const a = rand(3, 10); const b = a * m + 1; const c = rand(3, 10); const correct = c * m + 1; return { q: `${a} → ${b}, ${c} → ?`, correct, hint: `Multiply then add 1.`, explanation: `Rule: ×${m} + 1. ${c}×${m}+1 = ${correct}` }; }
+          const a = rand(2, 8); const b = a * a * a; const c = rand(2, 8); const correct = c * c * c;
+          return { q: `${a} → ${b}, ${c} → ?`, correct, hint: `How is ${b} related to ${a}? Think powers.`, explanation: `Rule: cube it. ${c}³ = ${correct}` };
+        },
+      ];
+      const gen = pick(types)();
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(5, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: grade <= 4 ? 'medium' : 'hard', source: 'HCP / CogAT Prep' };
+    },
+
+    // ── MENTAL MATH / NUMBER SENSE (HCP) ────────────────────
+    mentalMath(grade) {
+      const types = grade <= 3 ? [
+        () => { const a = rand(2, 9), b = 10 - a; return { q: `What number added to ${a} makes 10?`, correct: b, hint: 'Number bonds to 10.', explanation: `${a} + ${b} = 10` }; },
+        () => { const n = rand(11, 49); const nearest10 = Math.round(n / 10) * 10; return { q: `What is ${n} rounded to the nearest 10?`, correct: nearest10, hint: 'Look at the ones digit.', explanation: `${n} ≈ ${nearest10}` }; },
+      ] : grade <= 5 ? [
+        () => { const a = rand(10, 99), b = 100 - a; return { q: `What number added to ${a} makes 100?`, correct: b, hint: 'Think complements to 100.', explanation: `${a} + ${b} = 100` }; },
+        () => { const a = rand(2, 9), b = rand(10, 20); const c1 = a * b; const options = [a * (b - 1), a * b, a * (b + 1), (a + 1) * b]; return { q: `Without calculating exactly, which is ${a} × ${b}?`, correct: c1, hint: `${a} × ${Math.round(b / 10) * 10} = ${a * Math.round(b / 10) * 10}. Adjust.`, explanation: `${a} × ${b} = ${c1}` }; },
+        () => { const n = rand(4, 12); const sq = n * n + rand(-5, 5); const correct = n; return { q: `√${n*n} = ?`, correct, hint: `What number times itself = ${n*n}?`, explanation: `${n} × ${n} = ${n*n}` }; },
+      ] : [
+        () => { const a = rand(11, 99); const correct = a * 11; return { q: `What is ${a} × 11? (Use the mental trick!)`, correct, hint: `${a} × 11: put the sum of digits in the middle.`, explanation: `${a} × 11 = ${correct}` }; },
+        () => { const a = rand(10, 50) * 2; const half = a / 2; return { q: `What is 50% of ${a}?`, correct: half, hint: '50% = half.', explanation: `50% of ${a} = ${half}` }; },
+        () => { const a = rand(2, 20), b = rand(2, 20); const c = rand(2, 20); const sum = a + b + c; return { q: `${a} + ${b} + ${c} = ? (Find quickly!)`, correct: sum, hint: 'Look for pairs that make 10 or 20.', explanation: `${a} + ${b} + ${c} = ${sum}` }; },
+      ];
+      const gen = pick(types)();
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(3, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: grade <= 3 ? 'easy' : 'medium', source: 'HCP / Number Sense' };
+    },
   };
 
   // ─── Category → Generator Mapping ────────────────────────
   function getGenerators(grade, category) {
     const map = {
-      arithmetic: ['addition', 'subtraction', 'multiplication', 'division', 'remainderDivision', 'orderOfOperations', 'negativeNumbers', 'exponents', 'squareRoots'],
-      logic: ['numberPattern', 'missingNumber', 'digitSum', 'divisibility', 'primeCheck', 'gcdLcm', 'factorCount', 'logicPuzzle', 'magicSquare'],
-      geometry: ['perimeter', 'area', 'circleGeometry', 'angles', 'volume', 'coordinateDistance'],
-      olympiad: ['orderOfOperations', 'gcdLcm', 'factorCount', 'primeCheck', 'logicPuzzle', 'magicSquare', 'permutationCombo', 'simpleEquation', 'inequality', 'countingPrinciple'],
-      word: ['wordProblem', 'ageWordProblem', 'moneyProblem', 'timeProblem', 'ratio', 'proportion', 'percentages', 'averageProblem', 'simpleProbability'],
-      mixed: ['addition', 'subtraction', 'multiplication', 'division', 'numberPattern', 'perimeter', 'area', 'wordProblem', 'missingNumber', 'exponents', 'digitSum', 'placeValue', 'rounding', 'fractionAddition', 'decimalArithmetic'],
+      arithmetic: ['addition', 'subtraction', 'multiplication', 'division', 'remainderDivision', 'orderOfOperations', 'negativeNumbers', 'exponents', 'squareRoots', 'estimation', 'mentalMath'],
+      logic: ['numberPattern', 'missingNumber', 'digitSum', 'divisibility', 'primeCheck', 'gcdLcm', 'factorCount', 'logicPuzzle', 'magicSquare', 'numberAnalogy'],
+      geometry: ['perimeter', 'area', 'circleGeometry', 'angles', 'volume', 'coordinateDistance', 'coordinatePlane', 'unitConversion'],
+      olympiad: ['orderOfOperations', 'gcdLcm', 'factorCount', 'primeCheck', 'logicPuzzle', 'magicSquare', 'permutationCombo', 'simpleEquation', 'inequality', 'countingPrinciple', 'numberAnalogy', 'mentalMath'],
+      word: ['wordProblem', 'ageWordProblem', 'moneyProblem', 'timeProblem', 'ratio', 'proportion', 'percentages', 'averageProblem', 'simpleProbability', 'percentChange', 'dataTable', 'unitConversion'],
+      mixed: ['addition', 'subtraction', 'multiplication', 'division', 'numberPattern', 'perimeter', 'area', 'wordProblem', 'missingNumber', 'exponents', 'digitSum', 'placeValue', 'rounding', 'fractionAddition', 'decimalArithmetic', 'estimation', 'meanMedianModeRange', 'unitConversion', 'dataTable', 'numberAnalogy', 'mentalMath', 'coordinatePlane', 'fractionMultDiv', 'percentChange'],
     };
     const gens = map[category] || map.mixed;
     return gens.filter(g => typeof Gen[g] === 'function');
