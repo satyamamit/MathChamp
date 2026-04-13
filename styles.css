@@ -2722,3 +2722,74 @@ body {
 .challenge-card-fastbridge .difficulty {
     color: #F59E0B !important;
 }
+
+/* ── Enhanced Dark Theme Polish ────────────────────────── */
+
+/* Brighter, bolder section titles */
+.section-title {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    letter-spacing: 0.3px;
+    text-shadow: 0 0 20px rgba(108, 99, 255, 0.15);
+}
+
+/* Better contrast for card descriptions */
+.challenge-card p {
+    color: #B8B8D0 !important;
+}
+
+/* Subtle card border for definition */
+.challenge-card {
+    border: 1px solid rgba(108, 99, 255, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Glow + lift on hover */
+.challenge-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 30px rgba(108, 99, 255, 0.2), 0 0 15px rgba(108, 99, 255, 0.1) !important;
+    border-color: rgba(108, 99, 255, 0.35) !important;
+}
+
+/* FastBridge aMath hover glow — orange tint */
+.challenge-card-fastbridge:hover {
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2), 0 0 15px rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+    border-left-color: #FBBF24 !important;
+}
+
+/* English / aReading hover glow — green tint */
+.challenge-card-english:hover {
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.2), 0 0 15px rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    border-left-color: #34D399 !important;
+}
+
+/* Special/gradient cards glow */
+.challenge-card-special:hover {
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.2), 0 0 15px rgba(108, 99, 255, 0.15) !important;
+}
+
+/* Card emoji bounce on hover */
+.challenge-card:hover .challenge-emoji {
+    transform: scale(1.15);
+    transition: transform 0.3s ease;
+}
+
+.challenge-emoji {
+    transition: transform 0.3s ease;
+}
+
+/* Badges slightly brighter */
+.points-badge {
+    background: rgba(108, 99, 255, 0.25) !important;
+    color: #B4ADFF !important;
+    border: 1px solid rgba(108, 99, 255, 0.2);
+}
+
+/* Challenge card h3 slightly brighter */
+.challenge-card h3 {
+    color: #F0F0FF !important;
+    font-weight: 600 !important;
+}
