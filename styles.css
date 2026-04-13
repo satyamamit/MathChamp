@@ -2629,6 +2629,60 @@ input::placeholder {
     color: var(--text-primary) !important;
 }
 
+/* ── Results Screen Dark Theme ───────────────────────── */
+.results-container {
+    color: var(--text-primary) !important;
+}
+
+.results-header h1 {
+    color: var(--primary-light) !important;
+}
+
+.results-header p {
+    color: var(--text-secondary) !important;
+}
+
+.result-stat {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.result-stat-value {
+    color: var(--primary-light) !important;
+}
+
+.result-stat-label {
+    color: var(--text-secondary) !important;
+}
+
+.result-item {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.result-item.result-correct {
+    border-left: 4px solid var(--accent-green) !important;
+    background: rgba(46, 213, 115, 0.06) !important;
+}
+
+.result-item.result-wrong {
+    border-left: 4px solid var(--secondary) !important;
+    background: rgba(255, 107, 107, 0.06) !important;
+}
+
+.result-item-text {
+    color: var(--text-primary) !important;
+}
+
+.result-item-pts {
+    color: var(--accent-yellow) !important;
+}
+
+.results-breakdown h3 {
+    color: var(--text-primary) !important;
+}
+
 /* Reward cards */
 .reward-card {
     border: 1px solid var(--border-color) !important;
