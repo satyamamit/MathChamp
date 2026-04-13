@@ -308,6 +308,13 @@
             state.useFirebase = initFirebase();
         }
 
+        // ─── Check for redirect sign-in result (e.g. after popup was blocked) ───
+        if (state.useFirebase && typeof FirebaseAuthHelper !== 'undefined') {
+            FirebaseAuthHelper.getRedirectResult().then(user => {
+                if (user) handleGoogleUser(user);
+            }).catch(() => {});
+        }
+
         // ─── Google Sign-In Button ───
         if (googleBtn) {
             googleBtn.addEventListener('click', async () => {
