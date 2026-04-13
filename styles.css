@@ -2709,3 +2709,16 @@ body {
 .bottom-nav .nav-item.active {
     color: var(--primary-light) !important;
 }
+
+/* FastBridge aMath cards */
+.challenge-card-fastbridge {
+    border-left: 4px solid #F59E0B !important;
+}
+
+.challenge-card-fastbridge:hover {
+    border-left-color: #FBBF24 !important;
+}
+
+.challenge-card-fastbridge .difficulty {
+    color: #F59E0B !important;
+}

@@ -25,7 +25,13 @@
         english_grammar: '✏️ Grammar Pro',
         english_reading: '📖 Reading Champ',
         english_spelling: '🔤 Spelling Bee',
-        english_mixed: '🇦 English Blitz'
+        english_mixed: '🇦 English Blitz',
+        fb_estimation: '🎯 Estimation Station',
+        fb_data: '📊 Data Detective',
+        fb_measurement: '📏 Measurement Master',
+        fb_number_sense: '🧠 Number Sense',
+        fb_probability: '🎲 Probability Pro',
+        fb_math_mixed: '⚡ aMath Blitz'
     };
 
     // ─── XP & LEVEL SYSTEM ─────────────────────────────────
@@ -611,10 +617,14 @@
 
         let questions;
         const isEnglish = category.startsWith('english_');
+        const isFastBridgeMath = category.startsWith('fb_');
         try {
             if (isEnglish && typeof getEnglishQuestions === 'function') {
                 // Route English categories to English question bank
                 questions = getEnglishQuestions(state.player.grade, category, count);
+            } else if (isFastBridgeMath && typeof getFastBridgeMathQuestions === 'function') {
+                // Route FastBridge Math categories to dedicated handler
+                questions = await getFastBridgeMathQuestions(state.player.grade, category, count);
             } else if (typeof QuestionAPI !== 'undefined' && QuestionAPI.getQuestions) {
                 questions = await QuestionAPI.getQuestions(state.player.grade, category, count);
             } else {
@@ -624,6 +634,8 @@
             console.warn('Question fetch error, using fallback:', e);
             if (isEnglish && typeof getEnglishQuestions === 'function') {
                 questions = getEnglishQuestions(state.player.grade, category, count);
+            } else if (isFastBridgeMath && typeof getFastBridgeMathQuestions === 'function') {
+                questions = await getFastBridgeMathQuestions(state.player.grade, category, count);
             } else {
                 questions = typeof getLocalQuestions === 'function'
                     ? getLocalQuestions(state.player.grade, category, count)
@@ -1330,7 +1342,7 @@
             sessContainer.innerHTML = `<div class="empty-state"><div class="empty-state-emoji">📊</div><p>No sessions yet. Start a challenge!</p></div>`;
         } else {
             sessContainer.innerHTML = '';
-            const catEmojis = { arithmetic: '🔢', logic: '🧩', geometry: '📐', olympiad: '🏆', word: '📖', mixed: '🎲', english_vocabulary: '📚', english_grammar: '✏️', english_reading: '📖', english_spelling: '🔤', english_mixed: '🇦' };
+            const catEmojis = { arithmetic: '🔢', logic: '🧩', geometry: '📐', olympiad: '🏆', word: '📖', mixed: '🎲', english_vocabulary: '📚', english_grammar: '✏️', english_reading: '📖', english_spelling: '🔤', english_mixed: '🇦', fb_estimation: '🎯', fb_data: '📊', fb_measurement: '📏', fb_number_sense: '🧠', fb_probability: '🎲', fb_math_mixed: '⚡' };
             sessions.slice(0, 15).forEach(s => {
                 const item = document.createElement('div');
                 item.className = 'session-item';

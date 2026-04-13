@@ -151,4 +151,82 @@
     }
   }
 
+  // ─── FastBridge Math Category Mapping ───────────────────
+  // Maps fb_ categories to which question pools & generators to use
+  const FB_CATEGORY_MAP = {
+    fb_estimation:    { questionCats: ['arithmetic'],       generators: ['estimation', 'rounding', 'mentalMath'] },
+    fb_data:          { questionCats: ['word', 'arithmetic'], generators: ['meanMedianModeRange', 'dataTable', 'averageProblem'] },
+    fb_measurement:   { questionCats: ['geometry'],          generators: ['unitConversion', 'perimeter', 'area', 'volume'] },
+    fb_number_sense:  { questionCats: ['arithmetic', 'logic'], generators: ['numberPattern', 'numberAnalogy', 'mentalMath', 'missingNumber'] },
+    fb_probability:   { questionCats: ['word'],              generators: ['simpleProbability', 'countingPrinciple', 'permutationCombo'] },
+    fb_math_mixed:    { questionCats: ['arithmetic', 'geometry', 'word', 'logic'], generators: ['estimation', 'meanMedianModeRange', 'unitConversion', 'numberAnalogy', 'mentalMath', 'simpleProbability', 'dataTable'] },
+  };
+
+  // ─── Global function: getFastBridgeMathQuestions ────────
+  function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+  window.getFastBridgeMathQuestions = async function(grade, category, count) {
+    grade = parseInt(grade) || 4;
+    count = count || 10;
+    const mapping = FB_CATEGORY_MAP[category];
+    if (!mapping) return [];
+
+    let pool = [];
+
+    // 1) Gather FastBridge-source static questions from the QUESTIONS bank
+    if (typeof QUESTIONS !== 'undefined') {
+      const gradeData = QUESTIONS[grade] || {};
+      const searchGrades = [grade, grade - 1, grade + 1].filter(g => g >= 1 && g <= 8);
+      for (const g of searchGrades) {
+        const gData = QUESTIONS[g] || {};
+        for (const cat of mapping.questionCats) {
+          const arr = gData[cat] || [];
+          // Prioritize FastBridge/HCP/CogAT tagged questions
+          arr.forEach(q => {
+            if (q.source && (q.source.includes('FastBridge') || q.source.includes('HCP') || q.source.includes('CogAT'))) {
+              pool.push({ ...q, _priority: g === grade ? 2 : 1 });
+            }
+          });
+        }
+      }
+    }
+
+    // Sort so current-grade questions come first
+    pool.sort((a, b) => b._priority - a._priority);
+    pool = pool.map(({ _priority, ...q }) => q);
+
+    // 2) Generate dynamic questions using QuestionAPI generators
+    if (typeof QuestionAPI !== 'undefined' && QuestionAPI.Gen) {
+      const gens = mapping.generators.filter(g => typeof QuestionAPI.Gen[g] === 'function');
+      if (gens.length > 0) {
+        const genCount = Math.max(count - pool.length, Math.ceil(count * 0.5));
+        let tries = 0;
+        while (pool.length < count + genCount && tries < genCount * 3) {
+          try {
+            const genName = gens[Math.floor(Math.random() * gens.length)];
+            const q = QuestionAPI.Gen[genName](grade);
+            if (q && q.q && q.options && q.options.length === 4 && typeof q.answer === 'number') {
+              pool.push(q);
+            }
+          } catch (e) { /* skip bad generation */ }
+          tries++;
+        }
+      }
+    }
+
+    // 3) If still short, pull from local bank regardless of source tag
+    if (pool.length < count && typeof QUESTIONS !== 'undefined') {
+      const gradeData = QUESTIONS[grade] || {};
+      for (const cat of mapping.questionCats) {
+        const arr = gradeData[cat] || [];
+        const existing = new Set(pool.map(q => q.q));
+        arr.forEach(q => {
+          if (!existing.has(q.q)) pool.push(q);
+        });
+      }
+    }
+
+    return shuffle(pool).slice(0, count);
+  };
+
 })();

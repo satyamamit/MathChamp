@@ -849,6 +849,13 @@ const QuestionAPI = (function () {
       olympiad: ['orderOfOperations', 'gcdLcm', 'factorCount', 'primeCheck', 'logicPuzzle', 'magicSquare', 'permutationCombo', 'simpleEquation', 'inequality', 'countingPrinciple', 'numberAnalogy', 'mentalMath'],
       word: ['wordProblem', 'ageWordProblem', 'moneyProblem', 'timeProblem', 'ratio', 'proportion', 'percentages', 'averageProblem', 'simpleProbability', 'percentChange', 'dataTable', 'unitConversion'],
       mixed: ['addition', 'subtraction', 'multiplication', 'division', 'numberPattern', 'perimeter', 'area', 'wordProblem', 'missingNumber', 'exponents', 'digitSum', 'placeValue', 'rounding', 'fractionAddition', 'decimalArithmetic', 'estimation', 'meanMedianModeRange', 'unitConversion', 'dataTable', 'numberAnalogy', 'mentalMath', 'coordinatePlane', 'fractionMultDiv', 'percentChange'],
+      // FastBridge aMath categories
+      fb_estimation: ['estimation', 'rounding', 'mentalMath'],
+      fb_data: ['meanMedianModeRange', 'dataTable', 'averageProblem'],
+      fb_measurement: ['unitConversion', 'perimeter', 'area', 'volume'],
+      fb_number_sense: ['numberPattern', 'numberAnalogy', 'mentalMath', 'missingNumber'],
+      fb_probability: ['simpleProbability', 'countingPrinciple', 'permutationCombo'],
+      fb_math_mixed: ['estimation', 'meanMedianModeRange', 'unitConversion', 'numberAnalogy', 'mentalMath', 'simpleProbability', 'dataTable', 'numberPattern', 'rounding'],
     };
     const gens = map[category] || map.mixed;
     return gens.filter(g => typeof Gen[g] === 'function');
