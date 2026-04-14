@@ -43,6 +43,18 @@
         });
     });
 
+    // ===================== SUBJECT TAB SWITCHER (global) =====================
+    window.switchSubject = function(subject) {
+        document.querySelectorAll('.subject-tab').forEach(function(t) {
+            if (t.dataset.subject === subject) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+        document.querySelectorAll('.subject-panel').forEach(function(p) {
+            if (p.dataset.subject === subject) p.classList.add('active');
+            else p.classList.remove('active');
+        });
+    };
+
     // ===================== CONSTANTS =====================
     const POINTS_MAP = { easy: 5, medium: 10, hard: 20 };
     const HINT_PENALTY = 2;
@@ -962,16 +974,7 @@
         // Edit profile
         $('#btn-edit-profile').onclick = openEditProfile;
 
-        // Subject tabs (Math / English)
-        $$('.subject-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const subject = tab.dataset.subject;
-                $$('.subject-tab').forEach(t => t.classList.toggle('active', t.dataset.subject === subject));
-                $$('.subject-panel').forEach(p => p.classList.toggle('active', p.dataset.subject === subject));
-            });
-        });
+        // Subject tabs handled by global window.switchSubject()
         $('#btn-logout').onclick = async () => {
             savePlayer();
             state.player = null;
