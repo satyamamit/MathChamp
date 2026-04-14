@@ -244,49 +244,57 @@
             if (state.player) showDashboard();
             return;
         }
-        console.log('🗑️ Resetting all data...');
 
-        // Init Firebase if not ready
+        // IMMEDIATELY prevent any further saves/syncs
+        state.player = null;
+        state.authUser = null;
+        state._resetting = true;
+
+        console.log('🗑️ Step 1: Clearing localStorage...');
+        localStorage.clear();
+        // Double-check
+        console.log('🗑️ localStorage keys remaining:', Object.keys(localStorage).length);
+
+        console.log('🗑️ Step 2: Init Firebase if needed...');
         if (!state.useFirebase && typeof initFirebase === 'function') {
             state.useFirebase = initFirebase();
         }
 
-        // Get the current Firebase user (wait a moment for auth if needed)
-        let uid = state.authUser?.uid;
-        if (!uid && state.useFirebase && typeof firebase !== 'undefined') {
+        // Get UID
+        let uid = null;
+        if (state.useFirebase && typeof firebase !== 'undefined') {
             try {
-                // Wait for auth to resolve
-                const user = await new Promise((resolve) => {
-                    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
-                    setTimeout(() => resolve(null), 3000); // timeout after 3s
-                });
-                if (user) uid = user.uid;
-            } catch (e) { console.warn('Auth wait failed:', e); }
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    uid = user.uid;
+                } else {
+                    // Wait for auth
+                    const resolved = await new Promise((resolve) => {
+                        const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+                        setTimeout(() => resolve(null), 3000);
+                    });
+                    if (resolved) uid = resolved.uid;
+                }
+            } catch (e) { console.warn('Auth error:', e); }
         }
 
-        // Delete from Firestore
+        console.log('🗑️ Step 3: Delete Firestore doc for uid:', uid);
         if (uid && state.useFirebase && typeof FirestoreDB !== 'undefined') {
             try {
                 const ok = await FirestoreDB.resetPlayer(uid);
-                console.log('🗑️ Firestore delete for uid:', uid, ok ? '✅' : '❌');
+                console.log('🗑️ Firestore delete:', ok ? '✅ Success' : '❌ Failed');
             } catch (e) { console.error('🗑️ Firestore delete error:', e); }
-        } else {
-            console.warn('🗑️ No uid available — Firestore data not cleared. uid:', uid);
         }
 
-        // Sign out from Firebase Auth
+        console.log('🗑️ Step 4: Sign out...');
         if (state.useFirebase && typeof firebase !== 'undefined') {
-            try { await firebase.auth().signOut(); console.log('🗑️ Signed out'); } catch (e) {}
+            try { await firebase.auth().signOut(); } catch (e) {}
         }
 
-        // Clear ALL localStorage
-        localStorage.clear();
-        console.log('🗑️ localStorage cleared (all keys)');
-
-        state.player = null;
-        state.authUser = null;
-        window.location.hash = '';
-        window.location.reload();
+        console.log('🗑️ Step 5: Final localStorage clear + reload');
+        localStorage.clear(); // One more time for safety
+        sessionStorage.clear();
+        window.location.href = window.location.pathname; // Clean URL, no hash
     }
     // Expose globally for console access
     window.resetMathChamp = resetAllData;
@@ -314,7 +322,7 @@
     }
 
     function savePlayer() {
-        if (!state.player) return;
+        if (!state.player || state._resetting) return;
         // Always save to localStorage as fallback (keyed by name AND uid if available)
         const all = JSON.parse(localStorage.getItem('mathchamp_players') || '{}');
         all[state.player.name.toLowerCase()] = state.player;
@@ -380,7 +388,7 @@
     // Force a full cloud sync: pull cloud data, merge with local, save everywhere
     let _syncInProgress = false;
     async function forceCloudSync(silent) {
-        if (_syncInProgress) { console.log('🔄 Sync already in progress, skipping'); return; }
+        if (_syncInProgress || state._resetting) { console.log('🔄 Sync skipped'); return; }
         if (!state.useFirebase || !state.authUser || !state.player) {
             if (!silent) showToast('Not signed in to Google — cannot sync', 'error');
             return;
