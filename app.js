@@ -231,8 +231,29 @@
             case 'rewards':      showRewardsStore(); break;
             case 'achievements': showAchievements(); break;
             case 'progress':     showProgress(); break;
+            case 'reset':        resetAllData(); break;
             default:             showDashboard(); break;
         }
+    }
+
+    // Full data reset — clears localStorage + Firestore
+    async function resetAllData() {
+        if (!confirm('⚠️ This will delete ALL your progress. Are you sure?')) {
+            showDashboard();
+            return;
+        }
+        console.log('🗑️ Resetting all data...');
+        // Clear Firestore
+        if (state.useFirebase && state.authUser && typeof FirestoreDB !== 'undefined') {
+            await FirestoreDB.resetPlayer(state.authUser.uid);
+        }
+        // Clear localStorage
+        localStorage.removeItem('mathchamp_players');
+        localStorage.removeItem('mathchamp_last_player');
+        state.player = null;
+        state.authUser = null;
+        window.location.hash = '';
+        window.location.reload();
     }
 
     // Handle browser back/forward

@@ -254,5 +254,18 @@ const FirestoreDB = {
             console.error('Firestore weekly leaderboard error:', err);
             return [];
         }
+    },
+
+    // Reset player data in Firestore
+    async resetPlayer(uid) {
+        if (!firebaseReady || !uid) return false;
+        try {
+            await firebaseDb.collection('players').doc(uid).delete();
+            console.log('🗑️ Firestore data deleted for uid:', uid);
+            return true;
+        } catch (err) {
+            console.error('❌ Firestore reset error:', err);
+            return false;
+        }
     }
 };
