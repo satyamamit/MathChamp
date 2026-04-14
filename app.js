@@ -1261,10 +1261,10 @@
         const levelInfo = getLevelFromXP(p.totalXP || 0);
         const tier = getTier(levelInfo.level);
 
-        $('#lb-points').textContent = (p.totalXP || 0).toLocaleString();
+        $('#lb-points').textContent = p.points.toLocaleString();
         $('#lb-your-name').textContent = p.name;
         $('#lb-your-tier').textContent = `${tier.emoji} ${tier.name}`;
-        $('#lb-your-xp').textContent = `${(p.totalXP || 0).toLocaleString()} XP`;
+        $('#lb-your-xp').textContent = `${(p.totalXP || 0).toLocaleString()} pts`;
         $('#lb-your-level').textContent = `Level ${levelInfo.level}`;
 
         // Stats
@@ -1383,7 +1383,7 @@
             const topClass = i === 0 ? 'top-1' : i === 1 ? 'top-2' : i === 2 ? 'top-3' : '';
             const youClass = pl.isYou ? 'is-you' : '';
             const xpVal = tab === 'weekly' && pl.weeklyXP != null ? pl.weeklyXP : (pl.totalXP || 0);
-            const xpDisplay = `${xpVal.toLocaleString()} XP`;
+            const xpDisplay = `${xpVal.toLocaleString()} pts`;
 
             // Avatar: use photo if available, otherwise tier emoji
             const avatarContent = pl.photoURL
