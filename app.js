@@ -224,15 +224,16 @@
 
     // ─── Hash-based Router ──────────────────────────────────
     function navigateToHash(hash) {
-        if (!state.player) return; // Can't route without a player
         const route = (hash || '').replace('#', '');
+        // Allow reset even without a player
+        if (route === 'reset') { resetAllData(); return; }
+        if (!state.player) return; // Can't route without a player
         switch (route) {
             case 'dashboard':    showDashboard(); break;
             case 'leaderboard':  showLeaderboard(); break;
             case 'rewards':      showRewardsStore(); break;
             case 'achievements': showAchievements(); break;
             case 'progress':     showProgress(); break;
-            case 'reset':        resetAllData(); break;
             default:             showDashboard(); break;
         }
     }
@@ -240,22 +241,42 @@
     // Full data reset — clears localStorage + Firestore
     async function resetAllData() {
         if (!confirm('⚠️ This will delete ALL your progress. Are you sure?')) {
-            showDashboard();
+            if (state.player) showDashboard();
             return;
         }
         console.log('🗑️ Resetting all data...');
-        // Clear Firestore
-        if (state.useFirebase && state.authUser && typeof FirestoreDB !== 'undefined') {
-            await FirestoreDB.resetPlayer(state.authUser.uid);
+        // Init Firebase if not ready
+        if (!state.useFirebase && typeof initFirebase === 'function') {
+            state.useFirebase = initFirebase();
         }
-        // Clear localStorage
+        // Clear Firestore for current user
+        if (state.useFirebase && typeof FirestoreDB !== 'undefined') {
+            // Try current authUser first
+            if (state.authUser) {
+                await FirestoreDB.resetPlayer(state.authUser.uid);
+                console.log('🗑️ Cleared Firestore for uid:', state.authUser.uid);
+            } else {
+                // Try to get auth user directly
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        await FirestoreDB.resetPlayer(user.uid);
+                        console.log('🗑️ Cleared Firestore for uid:', user.uid);
+                    }
+                } catch (e) { console.warn('Could not clear Firestore:', e); }
+            }
+        }
+        // Clear ALL localStorage
         localStorage.removeItem('mathchamp_players');
         localStorage.removeItem('mathchamp_last_player');
         state.player = null;
         state.authUser = null;
+        console.log('🗑️ localStorage cleared');
         window.location.hash = '';
         window.location.reload();
     }
+    // Expose globally for console access
+    window.resetMathChamp = resetAllData;
 
     // Handle browser back/forward
     window.addEventListener('popstate', () => {
