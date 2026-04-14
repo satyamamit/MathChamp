@@ -39,6 +39,24 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Light Theme ─────────────────────────────────── */
+[data-theme="light"] {
+    --bg-main: #F0F2F5;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F5F5FF;
+    --bg-dark: #E8EAF0;
+    --bg-input: #F0F0F8;
+    --bg-highlight: #EEEEF8;
+    --border-color: #D0D0E0;
+    --text-primary: #1A1A2E;
+    --text-secondary: #555570;
+    --text-light: #888898;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --shadow-glow: 0 0 20px rgba(124, 115, 255, 0.15);
+}
+
 /* ---------- Reset & Base ---------- */
 *, *::before, *::after {
     margin: 0;
@@ -3268,3 +3286,668 @@ body {
     background: rgba(239, 68, 68, 0.1);
     color: #FCA5A5;
 }
+
+/* =============================================
+   THEME TOGGLE BUTTON
+   ============================================= */
+.btn-theme-toggle {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #FFF;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1) rotate(15deg);
+}
+
+/* Welcome screen toggle — top-right corner */
+.btn-theme-welcome {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-theme-welcome:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* =============================================
+   LIGHT THEME OVERRIDES
+   ============================================= */
+
+/* ── Toggle button in light mode ── */
+[data-theme="light"] .btn-theme-toggle {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #333;
+}
+
+[data-theme="light"] .btn-theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ── Welcome screen ── */
+[data-theme="light"] .welcome-container {
+    background: linear-gradient(135deg, #a8c0ff 0%, #c3b0f7 100%) !important;
+}
+
+[data-theme="light"] .welcome-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .welcome-card h2 {
+    color: #5B52CC !important;
+}
+
+[data-theme="light"] .form-group label {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .form-group input[type="text"] {
+    background: #F0F0F8 !important;
+    color: #1A1A2E !important;
+    border: 2px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .form-group input[type="text"]:focus {
+    border-color: #7C73FF !important;
+}
+
+[data-theme="light"] .grade-btn {
+    background: #F0F0F8 !important;
+    color: #1A1A2E !important;
+    border: 2px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .grade-btn.selected {
+    background: #7C73FF !important;
+    color: white !important;
+    border-color: #7C73FF !important;
+}
+
+[data-theme="light"] .auth-user-info {
+    background: rgba(46, 213, 115, 0.08) !important;
+    border: 1px solid rgba(46, 213, 115, 0.25) !important;
+}
+
+[data-theme="light"] .auth-user-name {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .btn-google {
+    background: #FFFFFF !important;
+    color: #1A1A2E !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .btn-google:hover {
+    background: #F5F5FF !important;
+}
+
+[data-theme="light"] .auth-divider span {
+    background: #FFFFFF !important;
+    color: #888898 !important;
+}
+
+[data-theme="light"] .auth-divider::before,
+[data-theme="light"] .auth-divider::after {
+    background: #D0D0E0 !important;
+}
+
+/* ── Nav bar ── */
+[data-theme="light"] .top-nav {
+    background: #FFFFFF !important;
+    border-bottom-color: #D0D0E0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .nav-title {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .nav-player {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .nav-user-avatar {
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    background: #F0F0F8 !important;
+}
+
+[data-theme="light"] .points-display {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .btn-sync-nav {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #555570 !important;
+}
+
+[data-theme="light"] .btn-signout-nav {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #555570 !important;
+}
+
+[data-theme="light"] .btn-signout-nav:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #EF4444 !important;
+}
+
+/* ── Dashboard ── */
+[data-theme="light"] .screen {
+    background: #F0F2F5 !important;
+}
+
+[data-theme="light"] .section-title {
+    color: #1A1A2E !important;
+    text-shadow: none !important;
+}
+
+[data-theme="light"] .xp-level-banner {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .xp-bar-track {
+    background: #E8EAF0 !important;
+}
+
+[data-theme="light"] .xp-bar-label,
+[data-theme="light"] .xp-level-text {
+    color: #555570 !important;
+}
+
+/* ── Challenge cards ── */
+[data-theme="light"] .challenge-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .challenge-card:hover {
+    background: #F8F8FF !important;
+    border-color: #7C73FF !important;
+    box-shadow: 0 8px 24px rgba(124, 115, 255, 0.12) !important;
+    transform: translateY(-4px) !important;
+}
+
+[data-theme="light"] .challenge-card h3 {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .challenge-card p {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .points-badge {
+    background: rgba(108, 99, 255, 0.1) !important;
+    color: #6C63FF !important;
+    border-color: rgba(108, 99, 255, 0.2) !important;
+}
+
+/* FastBridge card hover — light */
+[data-theme="light"] .challenge-card-fastbridge:hover {
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* English card hover — light */
+[data-theme="light"] .challenge-card-english:hover {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+/* AIME card hover — light */
+[data-theme="light"] .challenge-card-aime:hover {
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* ── Stat cards ── */
+[data-theme="light"] .stat-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .stat-label {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .stat-value {
+    color: #1A1A2E !important;
+}
+
+/* ── Quiz area ── */
+[data-theme="light"] .quiz-container,
+[data-theme="light"] .quiz-card {
+    background: #F0F2F5 !important;
+}
+
+[data-theme="light"] .question-area {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .question-text {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .question-number {
+    color: #6C63FF !important;
+}
+
+[data-theme="light"] .source-badge {
+    background: rgba(108, 99, 255, 0.1) !important;
+    color: #6C63FF !important;
+    border-color: rgba(108, 99, 255, 0.2) !important;
+}
+
+[data-theme="light"] .timer-bar-container {
+    background: #E8EAF0 !important;
+}
+
+[data-theme="light"] .answer-btn {
+    background: #FFFFFF !important;
+    color: #1A1A2E !important;
+    border: 2px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .answer-btn:hover {
+    background: #F5F5FF !important;
+    border-color: #7C73FF !important;
+}
+
+[data-theme="light"] .answer-btn.correct {
+    background: rgba(46, 213, 115, 0.12) !important;
+    border-color: #2ED573 !important;
+    color: #1A8F4E !important;
+}
+
+[data-theme="light"] .answer-btn.wrong {
+    background: rgba(255, 107, 107, 0.12) !important;
+    border-color: #FF6B6B !important;
+    color: #CC3333 !important;
+}
+
+/* ── Hint box ── */
+[data-theme="light"] .hint-box {
+    background: rgba(255, 165, 2, 0.08) !important;
+    border-color: rgba(255, 165, 2, 0.3) !important;
+}
+
+[data-theme="light"] .hint-text {
+    color: #B8860B !important;
+}
+
+[data-theme="light"] .btn-hint {
+    background: rgba(255, 165, 2, 0.1) !important;
+    border-color: rgba(255, 165, 2, 0.4) !important;
+    color: #B8860B !important;
+}
+
+[data-theme="light"] .btn-hint:hover:not(:disabled) {
+    background: #FFA502 !important;
+    color: #FFFFFF !important;
+}
+
+/* ── Feedback ── */
+[data-theme="light"] .feedback-area {
+    background: #F0F2F5 !important;
+    border-color: #D0D0E0 !important;
+}
+
+[data-theme="light"] .feedback-box.correct {
+    background: rgba(46, 213, 115, 0.1) !important;
+    border-color: #2ED573 !important;
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .feedback-box.wrong {
+    background: rgba(255, 107, 107, 0.1) !important;
+    border-color: #FF6B6B !important;
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .feedback-message {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .feedback-explanation {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .feedback-points {
+    color: #6C63FF !important;
+}
+
+/* ── Results screen ── */
+[data-theme="light"] .result-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+/* ── Leaderboard ── */
+[data-theme="light"] .leaderboard-card,
+[data-theme="light"] .leaderboard-content {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .lb-tabs {
+    background: #F0F0F8 !important;
+    border-color: #D0D0E0 !important;
+}
+
+[data-theme="light"] .lb-tab {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .lb-tab:hover {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .lb-tab.active {
+    background: #7C73FF !important;
+    color: white !important;
+}
+
+[data-theme="light"] .lb-row {
+    border: 1px solid #E8EAF0 !important;
+    background: #FFFFFF !important;
+}
+
+[data-theme="light"] .lb-row:hover {
+    background: #F5F5FF !important;
+}
+
+[data-theme="light"] .lb-row.top-1 {
+    background: rgba(255, 215, 0, 0.06) !important;
+    border-left: 4px solid #FFD700 !important;
+}
+
+[data-theme="light"] .lb-row.top-2 {
+    background: rgba(192, 192, 192, 0.06) !important;
+    border-left: 4px solid #C0C0C0 !important;
+}
+
+[data-theme="light"] .lb-row.top-3 {
+    background: rgba(205, 127, 50, 0.06) !important;
+    border-left: 4px solid #CD7F32 !important;
+}
+
+[data-theme="light"] .lb-row.current-player {
+    background: rgba(108, 99, 255, 0.06) !important;
+    border: 2px solid #7C73FF !important;
+}
+
+[data-theme="light"] .lb-name {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .lb-score {
+    color: #555570 !important;
+}
+
+[data-theme="light"] .lb-rank {
+    color: #6C63FF !important;
+}
+
+/* ── Rewards store ── */
+[data-theme="light"] .rewards-content,
+[data-theme="light"] .rewards-balance-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .reward-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .reward-card:hover {
+    background: #F8F8FF !important;
+}
+
+[data-theme="light"] .reward-name {
+    color: #1A1A2E !important;
+}
+
+[data-theme="light"] .reward-desc {
+    color: #555570 !important;
+}
+
+/* ── Achievements ── */
+[data-theme="light"] .achievements-content,
+[data-theme="light"] .achievement-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .achievement-card.locked {
+    background: #F0F2F5 !important;
+    opacity: 0.6;
+}
+
+[data-theme="light"] .achievement-desc {
+    color: #555570 !important;
+}
+
+/* ── Progress ── */
+[data-theme="light"] .progress-content {
+    background: #FFFFFF !important;
+}
+
+[data-theme="light"] .progress-row,
+[data-theme="light"] .session-item {
+    border: 1px solid #D0D0E0 !important;
+    background: #FFFFFF !important;
+}
+
+[data-theme="light"] .progress-bar-track {
+    background: #E8EAF0 !important;
+}
+
+[data-theme="light"] .session-reviewable:hover {
+    background: rgba(108, 99, 255, 0.06) !important;
+    border-color: rgba(108, 99, 255, 0.3) !important;
+}
+
+/* ── Daily challenge ── */
+[data-theme="light"] .daily-challenge-card {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .daily-progress-bar {
+    background: #E8EAF0 !important;
+}
+
+/* ── Modal ── */
+[data-theme="light"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="light"] .modal-box {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+    color: #1A1A2E !important;
+}
+
+/* ── Buttons ── */
+[data-theme="light"] .btn-secondary {
+    background: #F0F0F8 !important;
+    color: #1A1A2E !important;
+    border: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .btn-secondary:hover {
+    background: #E8E8F0 !important;
+    border-color: #7C73FF !important;
+}
+
+[data-theme="light"] .btn-link {
+    color: #6C63FF !important;
+}
+
+/* ── Toast ── */
+[data-theme="light"] .toast {
+    background: #FFFFFF !important;
+    color: #1A1A2E !important;
+    border: 1px solid #D0D0E0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ── Sync status ── */
+[data-theme="light"] .sync-status.syncing {
+    background: #FFF3CD !important;
+    color: #856404 !important;
+}
+
+[data-theme="light"] .sync-status.synced {
+    background: #D4EDDA !important;
+    color: #155724 !important;
+}
+
+[data-theme="light"] .sync-status.offline {
+    background: #F8D7DA !important;
+    color: #721C24 !important;
+}
+
+/* ── Bottom nav ── */
+[data-theme="light"] .bottom-nav {
+    background: #FFFFFF !important;
+    border-top: 1px solid #D0D0E0 !important;
+}
+
+[data-theme="light"] .bottom-nav .nav-item {
+    color: #888898 !important;
+}
+
+[data-theme="light"] .bottom-nav .nav-item.active {
+    color: #6C63FF !important;
+}
+
+/* ── Scrollbar — light ── */
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #F0F2F5;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #C0C0D0;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: #A0A0B0;
+}
+
+/* ── Review modal — light ── */
+[data-theme="light"] .review-modal {
+    background: #FFFFFF;
+    border-color: #D0D0E0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .review-header {
+    border-bottom-color: #E8EAF0;
+}
+
+[data-theme="light"] .review-header h2 {
+    color: #1A1A2E;
+}
+
+[data-theme="light"] .review-close {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+}
+
+[data-theme="light"] .review-close:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="light"] .review-summary {
+    border-bottom-color: #E8EAF0;
+}
+
+[data-theme="light"] .review-summary-title {
+    color: #1A1A2E;
+}
+
+[data-theme="light"] .review-summary-meta {
+    color: #888898;
+}
+
+[data-theme="light"] .review-stat {
+    background: rgba(108, 99, 255, 0.08);
+    color: #6C63FF;
+}
+
+[data-theme="light"] .review-question {
+    background: #FAFAFA;
+    border-color: #E8EAF0;
+}
+
+[data-theme="light"] .review-question.review-correct {
+    border-left-color: #10B981;
+}
+
+[data-theme="light"] .review-question.review-wrong {
+    border-left-color: #EF4444;
+}
+
+[data-theme="light"] .review-q-num {
+    color: #1A1A2E;
+}
+
+[data-theme="light"] .review-q-diff {
+    color: #888898;
+}
+
+[data-theme="light"] .review-q-text {
+    color: #333;
+}
+
+[data-theme="light"] .review-answer-label {
+    color: #888898;
+}
+
+[data-theme="light"] .review-answer-correct {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+}
+
+[data-theme="light"] .review-answer-wrong {
+    background: rgba(239, 68, 68, 0.08);
+    color: #DC2626;
+}
+
+/* ── Empty state ── */
+[data-theme="light"] .empty-state {
+    background: #FFFFFF !important;
+    color: #555570 !important;
+}
+
+/* ── Redemption items ── */
+[data-theme="light"] .redemption-item {
+    background: #FFFFFF !important;
+    border: 1px solid #D0D0E0 !important;
+}
+

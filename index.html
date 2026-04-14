@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🧠 MathChamp - Challenge Your Brain!</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function(){var t=localStorage.getItem('mathchamp_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -16,6 +20,7 @@
     <!-- ==================== WELCOME / GRADE SELECT SCREEN ==================== -->
     <div id="screen-welcome" class="screen active">
         <div class="welcome-container">
+            <button id="btn-theme-toggle-welcome" class="btn-theme-toggle btn-theme-welcome" title="Toggle Light/Dark Mode">🌙</button>
             <div class="logo-area">
                 <div class="logo-icon">🧠</div>
                 <h1 class="app-title">MathChamp</h1>
@@ -86,6 +91,7 @@
                     <span class="coin-icon">🪙</span>
                     <span id="nav-points">0</span> pts
                 </div>
+                <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light/Dark Mode">🌙</button>
                 <button id="btn-sync-now" class="btn-sync-nav" title="Sync data to cloud" style="display:none;">🔄</button>
                 <button id="btn-logout" class="btn-signout-nav" title="Sign Out">🚪 Sign Out</button>
             </div>
