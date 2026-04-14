@@ -3103,3 +3103,168 @@ body {
     color: #F0F0FF !important;
     font-weight: 600 !important;
 }
+
+/* ── Session Review ─────────────────────────────────── */
+.session-reviewable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.session-reviewable:hover {
+    background: rgba(108, 99, 255, 0.15) !important;
+    border-color: rgba(108, 99, 255, 0.4) !important;
+    transform: translateX(4px);
+}
+.session-review-icon {
+    font-size: 1.1rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+.session-reviewable:hover .session-review-icon {
+    opacity: 1;
+}
+
+/* Review Modal Overlay */
+.review-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+}
+.review-modal {
+    background: var(--bg-card, #1A1A2E);
+    border-radius: 16px;
+    border: 1px solid rgba(108, 99, 255, 0.3);
+    max-width: 600px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.review-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #F0F0FF;
+}
+.review-close {
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #FF6B6B;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.review-close:hover {
+    background: rgba(255, 107, 107, 0.3);
+}
+.review-summary {
+    padding: 16px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.review-summary-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #F0F0FF;
+}
+.review-summary-meta {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 4px 0 12px;
+}
+.review-summary-stats {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.review-stat {
+    background: rgba(108, 99, 255, 0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #B4ADFF;
+}
+.review-questions-list {
+    padding: 12px 16px;
+}
+.review-question {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+}
+.review-question.review-correct {
+    border-left: 3px solid #10B981;
+}
+.review-question.review-wrong {
+    border-left: 3px solid #EF4444;
+}
+.review-q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.review-q-num {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #F0F0FF;
+}
+.review-q-diff {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+}
+.review-q-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+.review-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.review-answer {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+.review-answer-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+}
+.review-answer-correct {
+    background: rgba(16, 185, 129, 0.1);
+    color: #6EE7B7;
+}
+.review-answer-wrong {
+    background: rgba(239, 68, 68, 0.1);
+    color: #FCA5A5;
+}

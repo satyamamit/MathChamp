@@ -1262,12 +1262,19 @@
             if (acc >= 0.8) p.blitzHighAccuracy = (p.blitzHighAccuracy || 0) + 1;
         }
 
-        // Session history
+        // Session history — save detailed Q&A for review
         if (!p.sessions) p.sessions = [];
         p.sessions.unshift({
             date: new Date().toISOString(), category: quiz.category,
             correct: quiz.score, total: quiz.results.length,
-            points: quiz.pointsEarned, xp: totalXP, combo: quiz.maxCombo
+            points: quiz.pointsEarned, xp: totalXP, combo: quiz.maxCombo,
+            questions: quiz.results.map(r => ({
+                q: r.question,
+                selected: r.selected,
+                answer: r.answer,
+                correct: r.correct,
+                difficulty: r.difficulty
+            }))
         });
         if (p.sessions.length > 50) p.sessions = p.sessions.slice(0, 50);
 
@@ -1649,23 +1656,30 @@
         } else {
             sessContainer.innerHTML = '';
             const catEmojis = { arithmetic: '🔢', logic: '🧩', geometry: '📐', olympiad: '🏆', word: '📖', mixed: '🎲', english_vocabulary: '📚', english_grammar: '✏️', english_reading: '📖', english_spelling: '🔤', english_mixed: '🇦', fb_estimation: '🎯', fb_data: '📊', fb_measurement: '📏', fb_number_sense: '🧠', fb_probability: '🎲', fb_math_mixed: '⚡' };
-            sessions.slice(0, 15).forEach(s => {
+            sessions.slice(0, 15).forEach((s, idx) => {
                 const item = document.createElement('div');
                 item.className = 'session-item';
+                const hasReview = s.questions && s.questions.length > 0;
+                if (hasReview) item.classList.add('session-reviewable');
                 const date = new Date(s.date).toLocaleDateString();
+                const time = new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 item.innerHTML = `
                     <div class="session-left">
                         <span class="session-cat-emoji">${catEmojis[s.category] || '📝'}</span>
                         <div>
                             <div class="session-cat-name">${CATEGORY_NAMES[s.category] || s.category}</div>
-                            <div class="session-date">${date}</div>
+                            <div class="session-date">${date} ${time}</div>
                         </div>
                     </div>
                     <div class="session-right">
                         <span class="session-score">${s.correct}/${s.total}</span>
                         <span class="session-pts">+${s.points} pts${s.combo >= 3 ? ' 🔥' + s.combo : ''}</span>
+                        ${hasReview ? '<span class="session-review-icon" title="Review answers">🔍</span>' : ''}
                     </div>
                 `;
+                if (hasReview) {
+                    item.onclick = () => showSessionReview(s);
+                }
                 sessContainer.appendChild(item);
             });
         }
@@ -1673,7 +1687,64 @@
         $('#btn-back-from-progress').onclick = showDashboard;
     }
 
-    // ===================== TOASTS =====================
+    // ===================== SESSION REVIEW =====================
+    function showSessionReview(session) {
+        const overlay = document.createElement('div');
+        overlay.className = 'review-overlay';
+        const date = new Date(session.date).toLocaleDateString();
+        const time = new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const accuracy = session.total > 0 ? Math.round((session.correct / session.total) * 100) : 0;
+        const catName = CATEGORY_NAMES[session.category] || session.category;
+
+        let questionsHTML = '';
+        session.questions.forEach((q, i) => {
+            const icon = q.correct ? '✅' : '❌';
+            const statusClass = q.correct ? 'review-correct' : 'review-wrong';
+            questionsHTML += `
+                <div class="review-question ${statusClass}">
+                    <div class="review-q-header">
+                        <span class="review-q-num">${icon} Q${i + 1}</span>
+                        <span class="review-q-diff">${q.difficulty || ''}</span>
+                    </div>
+                    <div class="review-q-text">${q.q}</div>
+                    <div class="review-answers">
+                        <div class="review-answer ${q.correct ? 'review-answer-correct' : 'review-answer-wrong'}">
+                            <span class="review-answer-label">Your answer:</span>
+                            <span>${q.selected || '—'}</span>
+                        </div>
+                        ${!q.correct ? `<div class="review-answer review-answer-correct">
+                            <span class="review-answer-label">Correct answer:</span>
+                            <span>${q.answer}</span>
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        overlay.innerHTML = `
+            <div class="review-modal">
+                <div class="review-header">
+                    <h2>📋 Quiz Review</h2>
+                    <button class="review-close" onclick="this.closest('.review-overlay').remove()">✖</button>
+                </div>
+                <div class="review-summary">
+                    <div class="review-summary-title">${catName}</div>
+                    <div class="review-summary-meta">${date} at ${time}</div>
+                    <div class="review-summary-stats">
+                        <span class="review-stat">${session.correct}/${session.total} correct</span>
+                        <span class="review-stat">${accuracy}% accuracy</span>
+                        <span class="review-stat">+${session.points} pts</span>
+                    </div>
+                </div>
+                <div class="review-questions-list">
+                    ${questionsHTML}
+                </div>
+            </div>
+        `;
+
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+        document.body.appendChild(overlay);
+    }
     function showToast(message, type = 'info') {
         const container = $('#toast-container');
         const toast = document.createElement('div');
