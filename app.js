@@ -400,7 +400,7 @@
         console.log('🔄 Force sync started...');
         try {
             const cloudPlayer = await FirestoreDB.loadPlayer(state.authUser.uid);
-            if (cloudPlayer) {
+            if (cloudPlayer && cloudPlayer.name !== 'RESET' && (cloudPlayer.totalXP || 0) > 0) {
                 delete cloudPlayer.updatedAt;
                 console.log('🔄 Cloud:', { xp: cloudPlayer.totalXP, quizzes: cloudPlayer.totalQuizzes, pts: cloudPlayer.points });
                 console.log('🔄 Local:', { xp: state.player.totalXP, quizzes: state.player.totalQuizzes, pts: state.player.points });
@@ -1757,7 +1757,7 @@
                         // Sync latest data from cloud
                         try {
                             const cloudPlayer = await FirestoreDB.loadPlayer(user.uid);
-                            if (cloudPlayer) {
+                            if (cloudPlayer && cloudPlayer.name !== 'RESET' && (cloudPlayer.totalXP || 0) > 0) {
                                 delete cloudPlayer.updatedAt;
                                 console.log('☁️ Cloud data:', { xp: cloudPlayer.totalXP, quizzes: cloudPlayer.totalQuizzes, points: cloudPlayer.points });
                                 console.log('💾 Local data:', { xp: state.player.totalXP, quizzes: state.player.totalQuizzes, points: state.player.points });

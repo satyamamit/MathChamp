@@ -251,15 +251,48 @@ const FirestoreDB = {
         }
     },
 
-    // Reset player data in Firestore
+    // Reset player data in Firestore (overwrite with empty data)
     async resetPlayer(uid) {
-        if (!firebaseReady || !uid) return false;
+        if (!firebaseReady || !uid) { console.warn('🗑️ resetPlayer: not ready or no uid'); return false; }
         try {
-            await firebaseDb.collection('players').doc(uid).delete();
-            console.log('🗑️ Firestore data deleted for uid:', uid);
+            // Overwrite with zeroed data instead of deleting (delete may be blocked by security rules)
+            await firebaseDb.collection('players').doc(uid).set({
+                name: 'RESET',
+                grade: 0,
+                points: 0,
+                totalPointsEarned: 0,
+                totalXP: 0,
+                totalQuizzes: 0,
+                totalCorrect: 0,
+                totalAttempted: 0,
+                perfectScores: 0,
+                streak: 0,
+                maxStreak: 0,
+                maxCombo: 0,
+                achievements: [],
+                sessions: [],
+                categoriesPlayed: {},
+                categoryHighScores: {},
+                dailyStreakDates: [],
+                totalRedemptions: 0,
+                quizzesWithNoHints: 0,
+                blitzHighAccuracy: 0,
+                hardCorrect: 0,
+                dailyChallengesCompleted: 0,
+                _resetAt: new Date().toISOString(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('🗑️ Firestore data RESET (overwritten with zeros) for uid:', uid);
+            // Also try to delete
+            try {
+                await firebaseDb.collection('players').doc(uid).delete();
+                console.log('🗑️ Firestore doc DELETED for uid:', uid);
+            } catch (delErr) {
+                console.warn('🗑️ Delete blocked (overwrite succeeded):', delErr.code);
+            }
             return true;
         } catch (err) {
-            console.error('❌ Firestore reset error:', err);
+            console.error('❌ Firestore reset error:', err.code, err.message);
             return false;
         }
     }
