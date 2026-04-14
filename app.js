@@ -964,11 +964,13 @@
 
         // Subject tabs (Math / English)
         $$('.subject-tab').forEach(tab => {
-            tab.onclick = () => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const subject = tab.dataset.subject;
                 $$('.subject-tab').forEach(t => t.classList.toggle('active', t.dataset.subject === subject));
                 $$('.subject-panel').forEach(p => p.classList.toggle('active', p.dataset.subject === subject));
-            };
+            });
         });
         $('#btn-logout').onclick = async () => {
             savePlayer();

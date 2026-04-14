@@ -644,11 +644,13 @@ body {
     padding: 4px;
     margin-bottom: 20px;
     border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 5;
 }
 
 .subject-tab {
     flex: 1;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border: none;
     background: none;
     font-family: var(--font-main);
@@ -659,6 +661,12 @@ body {
     border-radius: var(--radius-full);
     transition: all 0.25s ease;
     text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 2;
 }
 
 .subject-tab:hover {
@@ -864,6 +872,10 @@ body {
     color: var(--text-light);
     white-space: nowrap;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .tab-item .tab-icon {
