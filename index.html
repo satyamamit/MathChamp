@@ -342,23 +342,33 @@
                 </div>
             </div>
 
-            <!-- Bottom Actions -->
-            <div class="bottom-actions">
-                <button id="btn-leaderboard" class="btn-secondary btn-large">
-                    🏆 Leaderboard
-                </button>
-                <button id="btn-rewards" class="btn-secondary btn-large">
-                    🎁 Rewards Store
-                </button>
-                <button id="btn-achievements" class="btn-secondary btn-large">
-                    🏅 Achievements
-                </button>
-                <button id="btn-history" class="btn-secondary btn-large">
-                    📊 My Progress
-                </button>
-            </div>
         </div>
+
     </div>
+
+    <!-- Bottom Tab Bar (outside all screens so it persists) -->
+    <nav class="bottom-tab-bar" id="bottom-tab-bar">
+        <button id="btn-tab-home" class="tab-item active" data-tab="home">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Home</span>
+        </button>
+        <button id="btn-leaderboard" class="tab-item" data-tab="leaderboard">
+            <span class="tab-icon">🏆</span>
+            <span class="tab-label">Leaderboard</span>
+        </button>
+        <button id="btn-rewards" class="tab-item" data-tab="rewards">
+            <span class="tab-icon">🎁</span>
+            <span class="tab-label">Rewards</span>
+        </button>
+        <button id="btn-achievements" class="tab-item" data-tab="achievements">
+            <span class="tab-icon">🏅</span>
+            <span class="tab-label">Achieve</span>
+        </button>
+        <button id="btn-history" class="tab-item" data-tab="progress">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Progress</span>
+        </button>
+    </nav>
 
     <!-- ==================== QUIZ SCREEN ==================== -->
     <div id="screen-quiz" class="screen">

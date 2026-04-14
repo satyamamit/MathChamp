@@ -249,6 +249,18 @@
         state.currentScreen = screenId;
         window.scrollTo(0, 0);
 
+        // Show/hide bottom tab bar (visible on dashboard + tab screens)
+        const tabBar = $('#bottom-tab-bar');
+        if (tabBar) {
+            const tabScreens = ['dashboard', 'leaderboard', 'rewards', 'achievements', 'progress'];
+            tabBar.style.display = tabScreens.includes(screenId) ? 'flex' : 'none';
+
+            // Highlight active tab
+            const tabMap = { dashboard: 'home', leaderboard: 'leaderboard', rewards: 'rewards', achievements: 'achievements', progress: 'progress' };
+            const activeTab = tabMap[screenId] || '';
+            $$('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
+        }
+
         // Update URL hash for routing (skip quiz/results — transient screens)
         const routableScreens = ['dashboard', 'leaderboard', 'rewards', 'achievements', 'progress'];
         if (routableScreens.includes(screenId)) {
@@ -855,7 +867,8 @@
             };
         });
 
-        // Bottom buttons
+        // Bottom tab bar
+        $('#btn-tab-home').onclick = showDashboard;
         $('#btn-leaderboard').onclick = showLeaderboard;
         $('#btn-rewards').onclick = showRewardsStore;
         $('#btn-achievements').onclick = showAchievements;
