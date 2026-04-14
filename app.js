@@ -240,38 +240,51 @@
 
     // Full data reset — clears localStorage + Firestore
     async function resetAllData() {
-        if (!confirm('⚠️ This will delete ALL your progress. Are you sure?')) {
+        if (!confirm('⚠️ This will delete ALL your progress on this device and in the cloud. Are you sure?')) {
             if (state.player) showDashboard();
             return;
         }
         console.log('🗑️ Resetting all data...');
+
         // Init Firebase if not ready
         if (!state.useFirebase && typeof initFirebase === 'function') {
             state.useFirebase = initFirebase();
         }
-        // Clear Firestore for current user
-        if (state.useFirebase && typeof FirestoreDB !== 'undefined') {
-            // Try current authUser first
-            if (state.authUser) {
-                await FirestoreDB.resetPlayer(state.authUser.uid);
-                console.log('🗑️ Cleared Firestore for uid:', state.authUser.uid);
-            } else {
-                // Try to get auth user directly
-                try {
-                    const user = firebase.auth().currentUser;
-                    if (user) {
-                        await FirestoreDB.resetPlayer(user.uid);
-                        console.log('🗑️ Cleared Firestore for uid:', user.uid);
-                    }
-                } catch (e) { console.warn('Could not clear Firestore:', e); }
-            }
+
+        // Get the current Firebase user (wait a moment for auth if needed)
+        let uid = state.authUser?.uid;
+        if (!uid && state.useFirebase && typeof firebase !== 'undefined') {
+            try {
+                // Wait for auth to resolve
+                const user = await new Promise((resolve) => {
+                    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+                    setTimeout(() => resolve(null), 3000); // timeout after 3s
+                });
+                if (user) uid = user.uid;
+            } catch (e) { console.warn('Auth wait failed:', e); }
         }
+
+        // Delete from Firestore
+        if (uid && state.useFirebase && typeof FirestoreDB !== 'undefined') {
+            try {
+                const ok = await FirestoreDB.resetPlayer(uid);
+                console.log('🗑️ Firestore delete for uid:', uid, ok ? '✅' : '❌');
+            } catch (e) { console.error('🗑️ Firestore delete error:', e); }
+        } else {
+            console.warn('🗑️ No uid available — Firestore data not cleared. uid:', uid);
+        }
+
+        // Sign out from Firebase Auth
+        if (state.useFirebase && typeof firebase !== 'undefined') {
+            try { await firebase.auth().signOut(); console.log('🗑️ Signed out'); } catch (e) {}
+        }
+
         // Clear ALL localStorage
-        localStorage.removeItem('mathchamp_players');
-        localStorage.removeItem('mathchamp_last_player');
+        localStorage.clear();
+        console.log('🗑️ localStorage cleared (all keys)');
+
         state.player = null;
         state.authUser = null;
-        console.log('🗑️ localStorage cleared');
         window.location.hash = '';
         window.location.reload();
     }
