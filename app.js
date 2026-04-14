@@ -1261,7 +1261,7 @@
         const levelInfo = getLevelFromXP(p.totalXP || 0);
         const tier = getTier(levelInfo.level);
 
-        $('#lb-points').textContent = p.points.toLocaleString();
+        $('#lb-points').textContent = (p.totalXP || 0).toLocaleString();
         $('#lb-your-name').textContent = p.name;
         $('#lb-your-tier').textContent = `${tier.emoji} ${tier.name}`;
         $('#lb-your-xp').textContent = `${(p.totalXP || 0).toLocaleString()} XP`;
