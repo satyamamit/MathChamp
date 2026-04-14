@@ -694,22 +694,21 @@
                 console.warn('Failed to load cloud data:', e);
             }
 
-            // Also check localStorage for existing data (by uid or name)
+            // Also check localStorage for existing data — ONLY by uid (not by name,
+            // because name-based lookup can cross-contaminate between different Google accounts)
             const all = JSON.parse(localStorage.getItem('mathchamp_players') || '{}');
             const localByUid = all['__uid__' + user.uid] || null;
-            const localByName = all[(displayName.split(' ')[0]).toLowerCase()] || null;
-            const localPlayer = localByUid || localByName;
 
-            if (cloudPlayer && localPlayer) {
+            if (cloudPlayer && localByUid) {
                 // Merge: keep the higher value for each stat
-                state.player = mergePlayerData(cloudPlayer, localPlayer);
+                state.player = mergePlayerData(cloudPlayer, localByUid);
                 showToast(`Welcome back, ${state.player.name}! ☁️ Data synced & merged.`, 'success');
             } else if (cloudPlayer) {
                 state.player = cloudPlayer;
                 showToast(`Welcome back, ${cloudPlayer.name}! ☁️ Data loaded from cloud.`, 'success');
-            } else if (localPlayer) {
-                state.player = localPlayer;
-                showToast(`Welcome back, ${localPlayer.name}! Local data found.`, 'success');
+            } else if (localByUid) {
+                state.player = localByUid;
+                showToast(`Welcome back, ${localByUid.name}! Local data found.`, 'success');
             } else {
                 // No data anywhere — will create fresh on "Let's Go"
                 showToast(`Welcome! Sign in successful. Choose your grade to start.`, 'success');
