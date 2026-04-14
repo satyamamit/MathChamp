@@ -19,6 +19,7 @@
         logic: '🧩 Logic Legend',
         geometry: '📐 Shape Shifter',
         olympiad: '🏆 Olympiad Crusher',
+        aime: '🔥 AIME Challenge',
         word: '📖 Word Wizard',
         mixed: '🎲 Random Blitz',
         english_vocabulary: '📚 Vocabulary Builder',

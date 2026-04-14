@@ -2986,6 +2986,20 @@ body {
     color: #F59E0B !important;
 }
 
+/* AIME Challenge card */
+.challenge-card-aime {
+    border-left: 4px solid #EF4444 !important;
+    position: relative;
+}
+
+.challenge-card-aime:hover {
+    border-left-color: #F87171 !important;
+}
+
+.challenge-card-aime .difficulty {
+    color: #EF4444 !important;
+}
+
 /* FastBridge aReading (English) cards */
 .challenge-card-english {
     position: relative;

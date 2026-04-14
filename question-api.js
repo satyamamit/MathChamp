@@ -838,6 +838,171 @@ const QuestionAPI = (function () {
       const gen = pick(types)();
       return { q: gen.q, ...makeOptions(gen.correct, Math.max(3, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: grade <= 3 ? 'easy' : 'medium', source: 'HCP / Number Sense' };
     },
+
+    // ── AIME-STYLE PROBLEMS ─────────────────────────────────
+    aimeNumberTheory(grade) {
+      if (grade < 5) return Gen.gcdLcm(grade);
+      const types = [
+        () => {
+          const a = rand(2, 9), b = rand(2, 9);
+          const lcm = (a * b) / gcd(a, b);
+          const limit = rand(50, 200);
+          const count = Math.floor(limit / lcm);
+          return { q: `How many positive integers less than or equal to ${limit} are divisible by both ${a} and ${b}?`, correct: count, hint: `Find the LCM of ${a} and ${b} first, then count multiples.`, explanation: `LCM(${a}, ${b}) = ${lcm}. Multiples ≤ ${limit}: ${limit} ÷ ${lcm} = ${count}` };
+        },
+        () => {
+          const n = rand(2, 6);
+          const factorial = [1, 1, 2, 6, 24, 120, 720][n];
+          let zeros = 0, temp = factorial;
+          while (temp % 10 === 0 && temp > 0) { zeros++; temp = Math.floor(temp / 10); }
+          const bigN = rand(10, 30);
+          let trailingZeros = 0;
+          for (let p = 5; p <= bigN; p *= 5) trailingZeros += Math.floor(bigN / p);
+          return { q: `How many trailing zeros does ${bigN}! (${bigN} factorial) have?`, correct: trailingZeros, hint: 'Count how many times 5 is a factor. Each pair of 2 and 5 makes a trailing zero.', explanation: `Count factors of 5: ${Array.from({length: Math.floor(Math.log(bigN)/Math.log(5))}, (_, i) => `⌊${bigN}/${Math.pow(5,i+1)}⌋=${Math.floor(bigN/Math.pow(5,i+1))}`).join(' + ')} = ${trailingZeros}` };
+        },
+        () => {
+          const base = rand(2, 5);
+          const exp = rand(2, 6);
+          const result = Math.pow(base, exp);
+          const unitDigit = result % 10;
+          const bigExp = exp + rand(4, 20) * 4;
+          return { q: `What is the units digit of ${base}^${bigExp}?`, correct: unitDigit, hint: `Units digits cycle in a pattern. Find the cycle of ${base}^n.`, explanation: `Powers of ${base} have units digits that cycle every 4. ${base}^${bigExp} has units digit ${unitDigit}.` };
+        },
+        () => {
+          const a = rand(100, 500);
+          const d = rand(2, 9);
+          const digitSum = String(a).split('').reduce((s, c) => s + parseInt(c), 0);
+          return { q: `What is the sum of the digits of ${a * d}?`, correct: String(a * d).split('').reduce((s, c) => s + parseInt(c), 0), hint: 'Multiply first, then add the digits.', explanation: `${a} × ${d} = ${a * d}. Digit sum = ${String(a * d).split('').reduce((s, c) => s + parseInt(c), 0)}` };
+        },
+      ];
+      const gen = pick(types)();
+      if (!Number.isInteger(gen.correct) || gen.correct < 0) return Gen.gcdLcm(grade);
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(2, Math.floor(gen.correct * 0.3))), hint: gen.hint, explanation: gen.explanation, difficulty: 'hard', source: 'AIME Style' };
+    },
+
+    aimeAlgebra(grade) {
+      if (grade < 5) return Gen.simpleEquation(grade);
+      const types = [
+        () => {
+          const a = rand(2, 8), b = rand(2, 8);
+          const sumAB = a + b, prodAB = a * b;
+          const sumSq = sumAB * sumAB - 2 * prodAB;
+          return { q: `If x + y = ${sumAB} and xy = ${prodAB}, what is x² + y²?`, correct: sumSq, hint: 'Use the identity: x² + y² = (x+y)² − 2xy.', explanation: `x² + y² = ${sumAB}² − 2(${prodAB}) = ${sumAB * sumAB} − ${2 * prodAB} = ${sumSq}` };
+        },
+        () => {
+          const n = rand(3, 8);
+          const sumN = n * (n + 1) / 2;
+          const sumSqN = n * (n + 1) * (2 * n + 1) / 6;
+          return { q: `What is 1² + 2² + 3² + ... + ${n}²?`, correct: sumSqN, hint: 'Use the formula: n(n+1)(2n+1)/6.', explanation: `${n}(${n + 1})(${2 * n + 1})/6 = ${sumSqN}` };
+        },
+        () => {
+          const r = rand(2, 5);
+          const n = rand(3, 6);
+          const firstTerm = rand(1, 4);
+          const sum = firstTerm * (Math.pow(r, n) - 1) / (r - 1);
+          return { q: `What is the sum of the geometric series: ${firstTerm} + ${firstTerm * r} + ${firstTerm * r * r} + ... (${n} terms)?`, correct: sum, hint: `Sum = a(rⁿ − 1)/(r − 1), where a=${firstTerm}, r=${r}, n=${n}.`, explanation: `${firstTerm}(${r}^${n} − 1)/(${r} − 1) = ${firstTerm}(${Math.pow(r, n)} − 1)/${r - 1} = ${sum}` };
+        },
+        () => {
+          const a = rand(1, 10), b = rand(1, 10);
+          const c = rand(1, 10), d = rand(1, 10);
+          const x = a + b, y = c + d;
+          return { q: `Solve: x + y = ${x + y} and x − y = ${x - y}. What is x?`, correct: x, hint: 'Add the two equations to eliminate y.', explanation: `Adding: 2x = ${x + y + x - y}, so x = ${x}` };
+        },
+        () => {
+          const n = rand(5, 15);
+          const an = 2 * n + 1;
+          const sum = n * (3 + an) / 2;
+          return { q: `In the arithmetic sequence 3, 5, 7, 9, ..., what is the sum of the first ${n} terms?`, correct: sum, hint: 'Sum = n(first + last)/2. Find the nth term first: aₙ = 3 + (n−1)×2.', explanation: `a${n} = 3 + ${n - 1}×2 = ${an}. Sum = ${n}(3 + ${an})/2 = ${sum}` };
+        },
+      ];
+      const gen = pick(types)();
+      if (!Number.isInteger(gen.correct) || gen.correct < 0) return Gen.simpleEquation(grade);
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(3, Math.floor(gen.correct * 0.15))), hint: gen.hint, explanation: gen.explanation, difficulty: 'hard', source: 'AIME Style' };
+    },
+
+    aimeCombinatorics(grade) {
+      if (grade < 4) return Gen.countingPrinciple(grade);
+      const types = [
+        () => {
+          const n = rand(4, 8);
+          const r = rand(2, Math.min(n - 1, 4));
+          const numer = Array.from({length: r}, (_, i) => n - i).reduce((a, b) => a * b, 1);
+          const denom = Array.from({length: r}, (_, i) => i + 1).reduce((a, b) => a * b, 1);
+          const comb = numer / denom;
+          return { q: `How many ways can you choose ${r} items from ${n} items? (C(${n},${r}))`, correct: comb, hint: `C(n,r) = n! / (r! × (n−r)!)`, explanation: `C(${n},${r}) = ${n}! / (${r}! × ${n - r}!) = ${comb}` };
+        },
+        () => {
+          const letters = rand(3, 5);
+          const word = ['MATH', 'BOAT', 'STAR', 'LAMP', 'CUBE', 'PLANE'][rand(0, 5)].slice(0, letters);
+          const fact = [1, 1, 2, 6, 24, 120][letters];
+          return { q: `How many different arrangements of the letters in "${word}" are possible?`, correct: fact, hint: `For ${letters} distinct letters, the answer is ${letters}!`, explanation: `${letters}! = ${fact}` };
+        },
+        () => {
+          const n = rand(3, 6);
+          const paths = Array.from({length: n}, (_, i) => n + i).reduce((a, b) => a * b, 1) / Array.from({length: n}, (_, i) => i + 1).reduce((a, b) => a * b, 1);
+          return { q: `How many paths from top-left to bottom-right of a ${n}×${n} grid (only moving right or down)?`, correct: paths, hint: `You need exactly ${n} rights and ${n} downs. Choose which ${n} of ${2 * n} steps are "right".`, explanation: `C(${2 * n},${n}) = ${paths}` };
+        },
+        () => {
+          const n = rand(4, 7);
+          const derangements = [0, 0, 1, 2, 9, 44, 265, 1854][n];
+          if (derangements > 300) {
+            const simpleN = rand(4, 5);
+            const simpleD = [0, 0, 1, 2, 9, 44][simpleN];
+            return { q: `${simpleN} students each wrote their name on a card. The cards are shuffled and handed back randomly. In how many ways does NO student get their own card?`, correct: simpleD, hint: 'This is a derangement problem. D(n) = n! × (1 − 1/1! + 1/2! − 1/3! + ...)', explanation: `D(${simpleN}) = ${simpleD}` };
+          }
+          return { q: `${n} students each wrote their name on a card. The cards are shuffled and handed back randomly. In how many ways does NO student get their own card?`, correct: derangements, hint: 'This is a derangement problem. D(n) = n! × (1 − 1/1! + 1/2! − 1/3! + ...)', explanation: `D(${n}) = ${derangements}` };
+        },
+      ];
+      const gen = pick(types)();
+      if (!Number.isInteger(gen.correct) || gen.correct < 0) return Gen.countingPrinciple(grade);
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(3, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: 'hard', source: 'AIME Style' };
+    },
+
+    aimeGeometry(grade) {
+      if (grade < 5) return Gen.area(grade);
+      const types = [
+        () => {
+          const a = rand(3, 12), b = rand(3, 12);
+          const diag = Math.round(Math.sqrt(a * a + b * b) * 10) / 10;
+          const diagInt = Math.round(diag);
+          if (Math.abs(diag - diagInt) > 0.01) {
+            const pyths = [[3,4,5],[5,12,13],[6,8,10],[8,15,17],[9,12,15]];
+            const [pa, pb, pc] = pick(pyths);
+            return { q: `A rectangle has sides ${pa} and ${pb}. What is the length of its diagonal?`, correct: pc, hint: 'Use the Pythagorean theorem: d² = a² + b².', explanation: `d = √(${pa}² + ${pb}²) = √(${pa*pa} + ${pb*pb}) = √${pa*pa + pb*pb} = ${pc}` };
+          }
+          return { q: `A rectangle has sides ${a} and ${b}. What is the length of its diagonal?`, correct: diagInt, hint: 'Use the Pythagorean theorem: d² = a² + b².', explanation: `d = √(${a}² + ${b}²) = √${a * a + b * b} = ${diagInt}` };
+        },
+        () => {
+          const s = rand(2, 10);
+          const area = Math.round(s * s * Math.sqrt(3) / 4);
+          const h = rand(3, 8);
+          const triArea = Math.round(0.5 * s * h);
+          return { q: `A triangle has base ${s} and height ${h}. What is its area?`, correct: triArea, hint: 'Area = ½ × base × height.', explanation: `Area = ½ × ${s} × ${h} = ${triArea}` };
+        },
+        () => {
+          const r = rand(2, 10);
+          const sector = rand(60, 180);
+          const arcLength = Math.round(2 * Math.PI * r * sector / 360);
+          const sectorArea = Math.round(Math.PI * r * r * sector / 360);
+          return { q: `A circle has radius ${r}. What is the area of a sector with angle ${sector}°? (Round to nearest integer, use π ≈ 3.14)`, correct: Math.round(3.14 * r * r * sector / 360), hint: 'Sector area = (θ/360) × πr².', explanation: `(${sector}/360) × 3.14 × ${r}² = ${Math.round(3.14 * r * r * sector / 360)}` };
+        },
+        () => {
+          const n = rand(5, 10);
+          const diags = n * (n - 3) / 2;
+          return { q: `A regular polygon has ${n} sides. How many diagonals does it have?`, correct: diags, hint: 'Formula: n(n−3)/2.', explanation: `${n}(${n}−3)/2 = ${n}×${n - 3}/2 = ${diags}` };
+        },
+        () => {
+          const a = rand(3, 8), b = rand(3, 8), c = rand(Math.abs(a - b) + 1, a + b - 1);
+          const s = (a + b + c) / 2;
+          const area = Math.round(Math.sqrt(s * (s - a) * (s - b) * (s - c)));
+          if (area <= 0 || !Number.isFinite(area)) return Gen.area(grade);
+          return { q: `A triangle has sides ${a}, ${b}, and ${c}. What is its area? (Round to nearest integer)`, correct: area, hint: "Use Heron's formula: √(s(s−a)(s−b)(s−c)) where s = (a+b+c)/2.", explanation: `s = ${s}, Area = √(${s}×${s - a}×${s - b}×${s - c}) ≈ ${area}` };
+        },
+      ];
+      const gen = pick(types)();
+      if (!Number.isInteger(gen.correct) || gen.correct <= 0) return Gen.area(grade);
+      return { q: gen.q, ...makeOptions(gen.correct, Math.max(2, Math.floor(gen.correct * 0.2))), hint: gen.hint, explanation: gen.explanation, difficulty: 'hard', source: 'AIME Style' };
+    },
   };
 
   // ─── Category → Generator Mapping ────────────────────────
@@ -847,6 +1012,7 @@ const QuestionAPI = (function () {
       logic: ['numberPattern', 'missingNumber', 'digitSum', 'divisibility', 'primeCheck', 'gcdLcm', 'factorCount', 'logicPuzzle', 'magicSquare', 'numberAnalogy'],
       geometry: ['perimeter', 'area', 'circleGeometry', 'angles', 'volume', 'coordinateDistance', 'coordinatePlane', 'unitConversion'],
       olympiad: ['orderOfOperations', 'gcdLcm', 'factorCount', 'primeCheck', 'logicPuzzle', 'magicSquare', 'permutationCombo', 'simpleEquation', 'inequality', 'countingPrinciple', 'numberAnalogy', 'mentalMath'],
+      aime: ['aimeNumberTheory', 'aimeAlgebra', 'aimeCombinatorics', 'aimeGeometry', 'permutationCombo', 'countingPrinciple', 'gcdLcm', 'factorCount', 'simpleEquation', 'inequality'],
       word: ['wordProblem', 'ageWordProblem', 'moneyProblem', 'timeProblem', 'ratio', 'proportion', 'percentages', 'averageProblem', 'simpleProbability', 'percentChange', 'dataTable', 'unitConversion'],
       mixed: ['addition', 'subtraction', 'multiplication', 'division', 'numberPattern', 'perimeter', 'area', 'wordProblem', 'missingNumber', 'exponents', 'digitSum', 'placeValue', 'rounding', 'fractionAddition', 'decimalArithmetic', 'estimation', 'meanMedianModeRange', 'unitConversion', 'dataTable', 'numberAnalogy', 'mentalMath', 'coordinatePlane', 'fractionMultDiv', 'percentChange'],
       // FastBridge aMath categories
