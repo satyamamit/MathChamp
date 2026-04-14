@@ -694,7 +694,7 @@
         // Top nav
         $('#nav-player-name').textContent = p.name;
         $('#nav-grade-badge').textContent = `Grade ${p.grade}`;
-        $('#nav-points').textContent = p.points.toLocaleString();
+        $('#nav-points').textContent = (p.totalXP || 0).toLocaleString();
 
         // User avatar
         const navAvatar = $('#nav-user-avatar');
@@ -732,7 +732,7 @@
         $('#dash-multiplier').textContent = streakMult;
 
         // Stats
-        $('#dash-points').textContent = p.points.toLocaleString();
+        $('#dash-points').textContent = (p.totalXP || 0).toLocaleString();
         $('#dash-streak').textContent = p.streak;
         $('#dash-solved').textContent = p.totalCorrect;
         const accuracy = p.totalAttempted ? Math.round((p.totalCorrect / p.totalAttempted) * 100) : 0;
@@ -1261,7 +1261,7 @@
         const levelInfo = getLevelFromXP(p.totalXP || 0);
         const tier = getTier(levelInfo.level);
 
-        $('#lb-points').textContent = p.points.toLocaleString();
+        $('#lb-points').textContent = (p.totalXP || 0).toLocaleString();
         $('#lb-your-name').textContent = p.name;
         $('#lb-your-tier').textContent = `${tier.emoji} ${tier.name}`;
         $('#lb-your-xp').textContent = `${(p.totalXP || 0).toLocaleString()} pts`;
@@ -1465,7 +1465,7 @@
 
     function redeemReward(item) {
         const p = state.player;
-        if (p.points < item.cost) { showToast('Not enough points!', 'error'); return; }
+        if (p.points < item.cost) { showToast('Not enough coins!', 'error'); return; }
         p.points -= item.cost;
         p.totalRedemptions = (p.totalRedemptions || 0) + 1;
         if (!p.redemptions) p.redemptions = [];
@@ -1502,7 +1502,7 @@
     function showAchievements() {
         showScreen('achievements');
         const p = state.player;
-        $('#ach-points').textContent = p.points.toLocaleString();
+        $('#ach-points').textContent = (p.totalXP || 0).toLocaleString();
         const grid = $('#achievements-grid');
         grid.innerHTML = '';
 
@@ -1542,7 +1542,7 @@
     function showProgress() {
         showScreen('progress');
         const p = state.player;
-        $('#prog-points').textContent = p.points.toLocaleString();
+        $('#prog-points').textContent = (p.totalXP || 0).toLocaleString();
 
         // Category bars
         const barsContainer = $('#category-bars');
