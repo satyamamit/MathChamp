@@ -794,6 +794,71 @@
         });
     }
 
+    // ===================== EDIT PROFILE =====================
+    function openEditProfile() {
+        const modal = $('#edit-profile-modal');
+        const nameInput = $('#edit-profile-name');
+        const gradeGrid = $('#edit-grade-grid');
+        const saveBtn = $('#btn-save-profile');
+        const cancelBtn = $('#btn-cancel-profile');
+
+        // Pre-fill current values
+        nameInput.value = state.player.name || '';
+
+        // Build grade buttons
+        gradeGrid.innerHTML = '';
+        let selectedGrade = state.player.grade;
+        for (let g = 1; g <= 8; g++) {
+            const btn = document.createElement('button');
+            btn.className = 'grade-btn' + (g === selectedGrade ? ' selected' : '');
+            btn.textContent = g;
+            btn.dataset.grade = g;
+            btn.type = 'button';
+            btn.onclick = () => {
+                gradeGrid.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedGrade = g;
+            };
+            gradeGrid.appendChild(btn);
+        }
+
+        modal.style.display = 'flex';
+
+        saveBtn.onclick = () => {
+            const newName = nameInput.value.trim();
+            if (!newName) { showToast('Please enter a name!', 'error'); return; }
+            if (!selectedGrade) { showToast('Please select a grade!', 'error'); return; }
+
+            const oldName = state.player.name;
+            state.player.name = newName;
+            state.player.grade = selectedGrade;
+            state.bots = generateBotPlayers(selectedGrade);
+
+            // Update localStorage key if name changed
+            if (oldName && oldName.toLowerCase() !== newName.toLowerCase()) {
+                const all = JSON.parse(localStorage.getItem('mathchamp_players') || '{}');
+                delete all[oldName.toLowerCase()];
+                all[newName.toLowerCase()] = state.player;
+                localStorage.setItem('mathchamp_players', JSON.stringify(all));
+                localStorage.setItem('mathchamp_last_player', newName);
+            }
+
+            savePlayer();
+            modal.style.display = 'none';
+            showToast(`Profile updated! ✅`, 'success');
+            showDashboard();
+        };
+
+        cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // Close on overlay click
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        };
+    }
+
     // ===================== DASHBOARD =====================
     function showDashboard() {
         showScreen('dashboard');
@@ -866,6 +931,9 @@
         $('#btn-rewards').onclick = showRewardsStore;
         $('#btn-achievements').onclick = showAchievements;
         $('#btn-history').onclick = showProgress;
+
+        // Edit profile
+        $('#btn-edit-profile').onclick = openEditProfile;
         $('#btn-logout').onclick = async () => {
             savePlayer();
             state.player = null;

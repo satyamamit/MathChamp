@@ -425,6 +425,110 @@ body {
     color: var(--text-primary);
 }
 
+/* Clickable profile area */
+.nav-profile-btn {
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.nav-profile-btn:hover {
+    background: rgba(108, 99, 255, 0.1);
+}
+
+.nav-edit-icon {
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-left: 4px;
+}
+
+.nav-profile-btn:hover .nav-edit-icon {
+    opacity: 1;
+}
+
+[data-theme="light"] .nav-profile-btn:hover {
+    background: rgba(108, 99, 255, 0.08);
+}
+
+/* Edit Profile Modal */
+.edit-profile-box {
+    text-align: left !important;
+}
+
+.edit-profile-box h2 {
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.edit-profile-box .modal-icon {
+    text-align: center;
+}
+
+.edit-profile-form .form-group {
+    margin-bottom: 16px;
+}
+
+.edit-profile-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.edit-profile-form input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: var(--font-main);
+    border: 2px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+}
+
+.edit-profile-form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.edit-grade-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-actions .btn-primary,
+.modal-actions .btn-secondary {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.modal-actions .btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-actions .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
 .grade-badge {
     background: linear-gradient(135deg, var(--accent-yellow) 0%, #FF8C00 100%);
     color: white;
